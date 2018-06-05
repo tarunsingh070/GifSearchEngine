@@ -1,5 +1,6 @@
 package tarun.example.com.gifsearchengine.data;
 
+import okhttp3.Callback;
 import tarun.example.com.gifsearchengine.data.remote.GiphyRestClient;
 
 /**
@@ -12,6 +13,11 @@ public class DataManagerImpl implements DataManager {
 
     public DataManagerImpl() {
         restClient = GiphyRestClient.getRestClient();
+    }
+
+    @Override
+    public void getTrendingGifs(Callback callback) {
+        restClient.getTrendingGifs(callback);
     }
 
 }
