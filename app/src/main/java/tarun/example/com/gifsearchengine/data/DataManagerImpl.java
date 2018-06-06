@@ -4,7 +4,7 @@ import com.google.android.gms.tasks.Task;
 
 import okhttp3.Callback;
 import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
-import tarun.example.com.gifsearchengine.data.remote.GiphyRestClient;
+import tarun.example.com.gifsearchengine.data.remote.giphy.GiphyRestClient;
 import tarun.example.com.gifsearchengine.data.remote.firebase.FirebaseDbHelper;
 import tarun.example.com.gifsearchengine.data.remote.firebase.FirebaseDbHelperImpl;
 

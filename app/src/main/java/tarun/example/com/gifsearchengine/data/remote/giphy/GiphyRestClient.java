@@ -1,4 +1,4 @@
-package tarun.example.com.gifsearchengine.data.remote;
+package tarun.example.com.gifsearchengine.data.remote.giphy;
 
 import okhttp3.Call;
 import okhttp3.Callback;

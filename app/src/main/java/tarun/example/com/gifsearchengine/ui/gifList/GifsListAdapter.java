@@ -17,7 +17,7 @@ import java.util.List;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
-import tarun.example.com.gifsearchengine.data.utils.ProgressBarUtils;
+import tarun.example.com.gifsearchengine.utils.ProgressBarUtils;
 
 public class GifsListAdapter extends RecyclerView.Adapter<GifsListAdapter.ViewHolder> {
 

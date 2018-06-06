@@ -22,7 +22,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
-import tarun.example.com.gifsearchengine.data.utils.ProgressBarUtils;
+import tarun.example.com.gifsearchengine.utils.ProgressBarUtils;
 import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 
 /**

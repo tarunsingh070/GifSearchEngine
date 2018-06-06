@@ -1,5 +1,8 @@
 package tarun.example.com.gifsearchengine.data.model.firebase;
 
+/**
+ * Model class for storing all relevant information related to a gif object to be stored in firebase db.
+ */
 public class FirebaseGif {
 
     private String id;

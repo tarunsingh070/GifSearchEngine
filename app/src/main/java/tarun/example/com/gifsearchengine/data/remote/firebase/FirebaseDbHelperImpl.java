@@ -6,6 +6,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import tarun.example.com.gifsearchengine.data.Constants;
 import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
 
+/**
+ * The implementation class corresponding to the {@link FirebaseDbHelper} interface where all methods
+ * related to FirebaseDB network calls are defined.
+ */
 public class FirebaseDbHelperImpl implements FirebaseDbHelper {
 
     @Override
