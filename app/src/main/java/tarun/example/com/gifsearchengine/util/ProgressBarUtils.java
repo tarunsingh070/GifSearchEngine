@@ -1,4 +1,4 @@
-package tarun.example.com.gifsearchengine.utils;
+package tarun.example.com.gifsearchengine.util;
 
 import android.content.Context;
 import android.support.v4.widget.CircularProgressDrawable;

@@ -14,7 +14,7 @@ import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 /**
  * The Launcher activity which would contain the different fragments for displaying further screens.
  */
-public class HomeActivity extends AppCompatActivity implements GifListFragment.OnGifListClickedListener {
+public class GifsActivity extends AppCompatActivity implements GifListFragment.OnGifListClickedListener {
 
     private FragmentManager manager;
 

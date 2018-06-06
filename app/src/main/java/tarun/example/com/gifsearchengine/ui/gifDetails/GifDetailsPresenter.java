@@ -62,7 +62,7 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
     }
 
     @Override
-    public void onGifRated(AdapterGifItem adapterGifItem, int rating) {
+    public void rateGif(AdapterGifItem adapterGifItem, int rating) {
         // Check if rating is greater than 0, else show an invalid rating error toast.
         if (rating > 0) {
             // Increment the rating count by 1, find the new average rating and then write the updated object to Firebase DB.

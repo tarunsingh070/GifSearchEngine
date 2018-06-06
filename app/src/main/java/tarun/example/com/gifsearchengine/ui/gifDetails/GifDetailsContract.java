@@ -23,7 +23,7 @@ public class GifDetailsContract {
 
     interface Presenter extends BasePresenter<View> {
 
-        void onGifRated(AdapterGifItem gif, int rating);
+        void rateGif(AdapterGifItem gif, int rating);
 
         void onResumeCalled();
 

@@ -26,7 +26,7 @@ import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.Constants;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
 import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsFragment;
-import tarun.example.com.gifsearchengine.utils.KeyboardUtils;
+import tarun.example.com.gifsearchengine.util.KeyboardUtils;
 
 /**
  * This fragment defines the UI to show the Gifs in a grid view format.
@@ -229,7 +229,7 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     }
 
     /**
-     * This interface must be implemented by HomeActivity as it contains this
+     * This interface must be implemented by GifsActivity as it contains this
      * fragment to allow an interaction with gif list to be communicated
      * to the activity and then to the {@link GifDetailsFragment}.
      */

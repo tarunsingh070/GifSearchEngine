@@ -22,7 +22,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
-import tarun.example.com.gifsearchengine.utils.ProgressBarUtils;
+import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
 import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 
 /**
@@ -142,7 +142,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onGifRated(gif, (int)ratingBar.getRating());
+                presenter.rateGif(gif, (int)ratingBar.getRating());
                 dismissDialog(alertDialog);
             }
         });
