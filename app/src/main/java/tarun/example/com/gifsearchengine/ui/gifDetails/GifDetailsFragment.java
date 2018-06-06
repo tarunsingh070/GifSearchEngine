@@ -73,19 +73,18 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
             gif = getArguments().getParcelable(ARG_GIF);
         }
 
-        presenter = new GifDetailsPresenter(gif.getFullGif());
+        presenter = new GifDetailsPresenter(gif);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // FixMe: Move this UI logic into presenter class.
-        // If title is not available, set App name as Activity title, otherwise use Gif title.
-        if (TextUtils.isEmpty(gif.getTitle())) {
-            getActivity().setTitle(getString(R.string.app_name));
-        } else {
-            getActivity().setTitle(gif.getTitle());
-        }
+        presenter.onResumeCalled();
+    }
+
+    @Override
+    public void setActivityTitle(String title) {
+        getActivity().setTitle(title);
     }
 
     @Override
@@ -189,24 +188,10 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
      * Populate all views with the details of the Gif opened.
      */
     @Override
-    public void populateGifDetails() {
+    public void populateGifDetails(String averageRating) {
         tvTitle.setText(gif.getTitle());
-        // FixMe: Move this UI logic into presenter class.
-        // Set rating as "Not Rated" if current rating is 0 for this gif, otherwise set the current average rating.
-        if (gif.getAverageRating() > 0) {
-            tvRating.setText(String.valueOf(gif.getAverageRating()));
-        } else {
-            tvRating.setText(R.string.not_rated);
-        }
-
-        // FixMe: Move this UI logic into presenter class.
-        // Set username as unknown if uploader is not available for this gif, otherwise set the associated uploader.
-        if (TextUtils.isEmpty(gif.getUserName())) {
-            tvUploader.setText(getString(R.string.unknown));
-        } else {
-            tvUploader.setText(gif.getUserName());
-        }
-
+        tvRating.setText(averageRating);
+        tvUploader.setText(gif.getUserName());
         tvUploadDate.setText(gif.getImportDate());
         tvHeight.setText(gif.getFullGif().getHeight());
         tvWidth.setText(gif.getFullGif().getWidth());

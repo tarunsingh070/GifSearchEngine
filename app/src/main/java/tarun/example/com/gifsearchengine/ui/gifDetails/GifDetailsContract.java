@@ -13,15 +13,19 @@ public class GifDetailsContract {
 
         void loadGif(String url);
 
-        void populateGifDetails();
+        void populateGifDetails(String averageRating);
 
         void showInvalidRatingErrorMessage();
+
+        void setActivityTitle(String title);
 
     }
 
     interface Presenter extends BasePresenter<View> {
 
         void onGifRated(AdapterGifItem gif, int rating);
+
+        void onResumeCalled();
 
     }
 
