@@ -25,9 +25,17 @@ public interface GifListContract {
 
         void updateGifsListAdapterData(List<AdapterGifItem> gifs);
 
+        void setSortingDropDownVisibility(boolean visibility);
+
+        void setActivityTitle(String title);
+
     }
 
     interface Presenter extends BasePresenter<View> {
+
+        void searchQueryChanged(String query);
+
+        void sortByOptionUpdated(int position);
 
     }
 

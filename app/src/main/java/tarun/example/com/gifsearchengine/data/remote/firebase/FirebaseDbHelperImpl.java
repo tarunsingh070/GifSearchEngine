@@ -16,7 +16,7 @@ public class FirebaseDbHelperImpl implements FirebaseDbHelper {
     public Task<Void> addOrUpdateGif(FirebaseGif firebaseGif) {
         return FirebaseDatabase.getInstance()
                 .getReference()
-                .child(Constants.GIFS)
+                .child(Constants.PATH_GIFS)
                 .child(firebaseGif.getId())
                 .setValue(firebaseGif);
     }

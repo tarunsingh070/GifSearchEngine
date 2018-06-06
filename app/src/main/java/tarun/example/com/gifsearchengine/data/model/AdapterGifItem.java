@@ -2,11 +2,12 @@ package tarun.example.com.gifsearchengine.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 /**
  * Model class for storing all relevant information related to a gif object to be displayed.
  */
-public class AdapterGifItem implements Parcelable {
+public class AdapterGifItem implements Parcelable, Comparable<AdapterGifItem> {
 
     private String id;
 
@@ -20,10 +21,8 @@ public class AdapterGifItem implements Parcelable {
 
     private FullGif fullGif;
 
-    // Will be used when ranking will be implemented
     private float averageRating;
 
-    // Will be used when ranking will be implemented
     private int ratingCount;
 
     public AdapterGifItem(String id, String userName, String importDate, String title
@@ -34,6 +33,13 @@ public class AdapterGifItem implements Parcelable {
         this.title = title;
         this.previewUrl = previewUrl;
         this.fullGif = fullGif;
+    }
+
+    public AdapterGifItem(String id, String previewUrl, float averageRating, int ratingCount) {
+        this.id = id;
+        this.previewUrl = previewUrl;
+        this.averageRating = averageRating;
+        this.ratingCount = ratingCount;
     }
 
     protected AdapterGifItem(Parcel in) {
@@ -138,6 +144,22 @@ public class AdapterGifItem implements Parcelable {
         dest.writeParcelable(fullGif, flags);
         dest.writeFloat(averageRating);
         dest.writeInt(ratingCount);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof AdapterGifItem && id.equals(((AdapterGifItem) obj).id);
+    }
+
+    @Override
+    public int compareTo(@NonNull AdapterGifItem o) {
+        // If averageRating is the same for two gifs, then try sorting as per the rating counts.
+        int comparisonVal = Float.compare(o.averageRating, averageRating);
+        if (comparisonVal == 0) {
+            return Integer.compare(o.ratingCount, ratingCount);
+        }
+
+        return comparisonVal;
     }
 
 }

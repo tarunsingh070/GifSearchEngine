@@ -5,4 +5,5 @@
     <string name="not_rated">Not Rated</string>
     <string name="unknown">Unknown</string>
     <string name="invalid_rating_error_message">Rating cannot be less than 1</string>
+    <string name="hint_search">Search Gifs</string>
 </resources>

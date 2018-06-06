@@ -9,9 +9,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import java.util.List;
 
@@ -19,6 +26,7 @@ import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.Constants;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
 import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsFragment;
+import tarun.example.com.gifsearchengine.utils.KeyboardUtils;
 
 /**
  * This fragment defines the UI to show the Gifs in a grid view format.
@@ -26,11 +34,17 @@ import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsFragment;
 public class GifListFragment extends Fragment implements GifListContract.View, GifsListAdapter.ItemClickListener {
 
     public static final String TAG = GifListFragment.class.getSimpleName();
+    public static final int SPINNER_OPTION_RELEVANCE_POSITION = 0;
+    public static final int SPINNER_OPTION_RANKING_POSITION = 1;
     private static final int NO_OF_COLUMNS = 3;
 
     private OnGifListClickedListener mListener;
     private GifListContract.Presenter presenter;
     private RecyclerView gifsRecyclerView;
+    private MenuItem searchMenuItem;
+    private MenuItem sortMenuItem;
+
+    SearchView searchView;
 
     private GifsListAdapter gifsListAdapter;
 
@@ -51,6 +65,7 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         presenter = new GifListPresenter();
     }
 
@@ -75,6 +90,73 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         super.onViewCreated(view, savedInstanceState);
         setupGifsRecyclerView();
         presenter.takeView(this);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.menu_gif_list, menu);
+
+        // Get searchView and add a text listener on it to perform search.
+        searchMenuItem = menu.findItem( R.id.action_search);
+        searchView = (SearchView) searchMenuItem.getActionView();
+        searchView.setOnQueryTextListener(getSearchTextListener());
+
+        sortMenuItem = menu.findItem(R.id.spinner_sort);
+        setupSortingSpinner();
+    }
+
+    /**
+     * Method to setup the sorting spinner.
+     */
+    private void setupSortingSpinner() {
+        Spinner sortingSpinner = (Spinner) sortMenuItem.getActionView();
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.sort_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortingSpinner.setAdapter(adapter);
+
+        sortingSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                presenter.sortByOptionUpdated(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing.
+            }
+        });
+    }
+
+    /**
+     * This method defines and returns QueryTextListener instance for handling queries when Search View widget is accessed.
+     * @return
+     */
+    private SearchView.OnQueryTextListener getSearchTextListener() {
+        return new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                KeyboardUtils.hideKeyboard(getContext(), getActivity());
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+                presenter.searchQueryChanged(s);
+                return false;
+            }
+        };
+    }
+
+    @Override
+    public void setSortingDropDownVisibility(boolean visibility) {
+        sortMenuItem.setVisible(visibility);
+    }
+
+    @Override
+    public void setActivityTitle(String title) {
+        getActivity().setTitle(title);
     }
 
     @Override
