@@ -41,6 +41,10 @@ public class HomeActivity extends AppCompatActivity implements GifListFragment.O
 
     @Override
     public void onGifClicked(AdapterGifItem gif) {
-        // Todo: Open GifDetailsFragment and pass the clicked gif item to it.
+        Fragment gifDetailsFragment = GifDetailsFragment.newInstance(gif);
+        manager.beginTransaction()
+                .replace(R.id.fragment_container, gifDetailsFragment, GifDetailsFragment.TAG)
+                .addToBackStack(GifDetailsFragment.TAG)
+                .commit();
     }
 }

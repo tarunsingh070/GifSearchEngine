@@ -1,14 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.gifDetails.GifDetailsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ImageView
+        android:id="@+id/iv_gif"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:scaleType="fitXY"/>
 
-</FrameLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/label_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="Title:"/>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/label_title"
+            tools:text="Gif title"/>
+
+        <TextView
+            android:id="@+id/label_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_title"
+            android:text="Rating:"/>
+
+        <TextView
+            android:id="@+id/tv_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/label_rating"
+            android:layout_toEndOf="@+id/label_rating"
+            tools:text="4"/>
+
+        <TextView
+            android:id="@+id/label_uploaded_by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_rating"
+            android:text="Uploaded by:"/>
+
+        <TextView
+            android:id="@+id/tv_uploader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/label_uploaded_by"
+            android:layout_toEndOf="@+id/label_uploaded_by"
+            tools:text="Tarun"/>
+
+        <TextView
+            android:id="@+id/label_upload_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_uploader"
+            android:text="Upload date:"/>
+
+        <TextView
+            android:id="@+id/tv_upload_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/label_upload_date"
+            android:layout_toEndOf="@+id/label_upload_date"
+            tools:text="23 May"/>
+
+        <TextView
+            android:id="@+id/label_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/label_upload_date"
+            android:text="Height:"/>
+
+        <TextView
+            android:id="@+id/tv_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/label_height"
+            android:layout_toEndOf="@+id/label_height"
+            tools:text="100px"/>
+
+        <TextView
+            android:id="@+id/label_width"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/label_height"
+            android:text="Width:"/>
+
+        <TextView
+            android:id="@+id/tv_width"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/label_width"
+            android:layout_toEndOf="@+id/label_width"
+            tools:text="100px"/>
+
+        <TextView
+            android:id="@+id/label_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/label_width"
+            android:text="Size:"/>
+
+        <TextView
+            android:id="@+id/tv_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/label_size"
+            android:layout_toEndOf="@+id/label_size"
+            tools:text="450kb"/>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/button_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rate"/>
+
+</LinearLayout>

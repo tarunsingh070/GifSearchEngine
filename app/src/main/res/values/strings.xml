@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">GifSearchEngine</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="submit">Submit</string>
+    <string name="not_rated">Not Rated</string>
+    <string name="unknown">Unknown</string>
+    <string name="invalid_rating_error_message">Rating cannot be less than 1</string>
 </resources>

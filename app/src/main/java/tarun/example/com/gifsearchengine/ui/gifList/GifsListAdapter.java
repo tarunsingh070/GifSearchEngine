@@ -17,6 +17,7 @@ import java.util.List;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.utils.ProgressBarUtils;
 
 public class GifsListAdapter extends RecyclerView.Adapter<GifsListAdapter.ViewHolder> {
 
@@ -82,26 +83,14 @@ public class GifsListAdapter extends RecyclerView.Adapter<GifsListAdapter.ViewHo
          */
         void loadGif(String url) {
             if (!TextUtils.isEmpty(url)) {
-                getProgressPlaceHolderView();
+                CircularProgressDrawable progressPlaceHolder = ProgressBarUtils.getCircularProgressPlaceholder(context);
                 Glide.with(context)
                         .asGif()
                         .load(url)
                         .apply(new RequestOptions()
-                                .placeholder(getProgressPlaceHolderView()))
+                                .placeholder(progressPlaceHolder))
                         .into(ivGif);
             }
-        }
-
-        /**
-         * A placeholder progress bar for each of the cell until the gif loads.
-         * @return
-         */
-        private CircularProgressDrawable getProgressPlaceHolderView() {
-            CircularProgressDrawable progressPlaceHolder = new CircularProgressDrawable(context);
-            progressPlaceHolder.setStrokeWidth(5f);
-            progressPlaceHolder.setCenterRadius(30f);
-            progressPlaceHolder.start();
-            return progressPlaceHolder;
         }
 
         @Override

@@ -5,6 +5,9 @@ package tarun.example.com.gifsearchengine.data;
  */
 public interface Constants {
 
+    // Firebase constants.
+    String GIFS = "gifs";
+
     // Activity Title Constants
     String ACTIVITY_TITLE_TRENDING = "Trending";
 
