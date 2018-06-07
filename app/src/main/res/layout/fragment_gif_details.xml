@@ -17,118 +17,106 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="10dp"
         android:layout_weight="1">
 
         <TextView
             android:id="@+id/label_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_alignParentStart="true"
-            android:text="Title:"/>
+            android:text="Title:" />
 
         <TextView
             android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_toEndOf="@+id/label_title"
-            tools:text="Gif title"/>
+            tools:text="Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title " />
 
         <TextView
             android:id="@+id/label_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_below="@id/tv_title"
-            android:text="Rating:"/>
+            android:text="Rating:" />
 
         <TextView
             android:id="@+id/tv_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_alignTop="@+id/label_rating"
             android:layout_toEndOf="@+id/label_rating"
-            tools:text="4"/>
+            tools:text="4" />
 
         <TextView
             android:id="@+id/label_uploaded_by"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_below="@id/tv_rating"
-            android:text="Uploaded by:"/>
+            android:text="Uploaded by:" />
 
         <TextView
             android:id="@+id/tv_uploader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_alignTop="@+id/label_uploaded_by"
             android:layout_toEndOf="@+id/label_uploaded_by"
-            tools:text="Tarun"/>
+            tools:text="Tarun" />
 
         <TextView
             android:id="@+id/label_upload_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_below="@id/tv_uploader"
-            android:text="Upload date:"/>
+            android:text="Upload date:" />
 
         <TextView
             android:id="@+id/tv_upload_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_alignTop="@+id/label_upload_date"
             android:layout_toEndOf="@+id/label_upload_date"
-            tools:text="23 May"/>
+            tools:text="23 May" />
 
         <TextView
             android:id="@+id/label_height"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_below="@id/label_upload_date"
-            android:text="Height:"/>
+            android:text="Height:" />
 
         <TextView
             android:id="@+id/tv_height"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_alignTop="@+id/label_height"
             android:layout_toEndOf="@+id/label_height"
-            tools:text="100px"/>
+            tools:text="100px" />
 
         <TextView
             android:id="@+id/label_width"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_below="@id/label_height"
-            android:text="Width:"/>
+            android:text="Width:" />
 
         <TextView
             android:id="@+id/tv_width"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_alignTop="@+id/label_width"
             android:layout_toEndOf="@+id/label_width"
-            tools:text="100px"/>
+            tools:text="100px" />
 
         <TextView
             android:id="@+id/label_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenLabelsStyle"
             android:layout_below="@id/label_width"
-            android:text="Size:"/>
+            android:text="Size:" />
 
         <TextView
             android:id="@+id/tv_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_alignTop="@+id/label_size"
             android:layout_toEndOf="@+id/label_size"
-            tools:text="450kb"/>
+            tools:text="450kb" />
 
     </RelativeLayout>
 
     <Button
         android:id="@+id/button_rate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Rate"/>
+        style="@style/WrappedButtonStyle"
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:text="Rate" />
 
 </LinearLayout>

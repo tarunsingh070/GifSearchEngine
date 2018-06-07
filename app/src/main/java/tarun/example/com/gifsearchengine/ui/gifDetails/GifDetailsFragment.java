@@ -20,6 +20,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
 import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
@@ -192,10 +196,29 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         tvTitle.setText(gif.getTitle());
         tvRating.setText(averageRating);
         tvUploader.setText(gif.getUserName());
-        tvUploadDate.setText(gif.getImportDate());
-        tvHeight.setText(gif.getFullGif().getHeight());
-        tvWidth.setText(gif.getFullGif().getWidth());
-        tvSize.setText(gif.getFullGif().getSize());
+        tvUploadDate.setText(getFormattedDate(gif.getImportDate()));
+        tvHeight.setText(getString(R.string.formatted_dimension_with_unit_px, gif.getFullGif().getHeight()));
+        tvWidth.setText(getString(R.string.formatted_dimension_with_unit_px, gif.getFullGif().getWidth()));
+        tvSize.setText(getString(R.string.formatted_size_with_unit_kb, gif.getFullGif().getSize()));
+    }
+
+    /**
+     * Convert the import date string received into a human readable format (eg. Jan 07, 2018).
+     * @param date The import date string received.
+     * @return The new formatted import date.
+     */
+    private String getFormattedDate(String date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(getString(R.string.received_import_date_format));
+        SimpleDateFormat desiredDateFormat = new SimpleDateFormat(getString(R.string.desired_import_date_format));
+        Date parsedDate;
+        try {
+            parsedDate = dateFormat.parse(date);
+            return desiredDateFormat.format(parsedDate);
+        } catch (ParseException e) {
+            // Return an empty string in case of issues parsing the date string received.
+            e.printStackTrace();
+            return "";
+        }
     }
 
     @Override

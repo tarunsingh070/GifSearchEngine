@@ -47,6 +47,9 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
             view.loadGif(gifUrl);
         }
 
+        // Calculate the size to be displayed in kb.
+        gif.getFullGif().setSize(String.valueOf(Integer.parseInt(gif.getFullGif().getSize()) / 1024));
+
         // Set username as unknown if uploader is not available for this gif.
         if (TextUtils.isEmpty(gif.getUserName())) {
             gif.setUserName("Unknown");

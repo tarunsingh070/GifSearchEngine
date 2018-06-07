@@ -72,7 +72,7 @@ public class GifListPresenter implements GifListContract.Presenter {
         dataManager.getRankedGifsFromFirebase(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!view.isViewVisible()) {
+                if (view == null || !view.isViewVisible()) {
                     return;
                 }
 
@@ -115,7 +115,7 @@ public class GifListPresenter implements GifListContract.Presenter {
         return new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (!view.isViewVisible()) {
+                if (view == null || !view.isViewVisible()) {
                     return;
                 }
 
@@ -179,7 +179,7 @@ public class GifListPresenter implements GifListContract.Presenter {
         return new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (!view.isViewVisible()) {
+                if (view == null || !view.isViewVisible()) {
                     return;
                 }
 
@@ -188,7 +188,7 @@ public class GifListPresenter implements GifListContract.Presenter {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (!view.isViewVisible()) {
+                if (view == null || !view.isViewVisible()) {
                     return;
                 }
 

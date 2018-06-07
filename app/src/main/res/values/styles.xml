@@ -17,4 +17,28 @@
         <item name="android:background">@drawable/layout_rounded_bg</item>
     </style>
 
+    <style name="WrappedButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/layout_rounded_bg</item>
+    </style>
+
+    <style name="GifDetailsScreenLabelsStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/secondary_text_light</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+    </style>
+
+    <style name="GifDetailsScreenFieldValuesStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@android:color/secondary_text_light</item>
+    </style>
+
 </resources>
