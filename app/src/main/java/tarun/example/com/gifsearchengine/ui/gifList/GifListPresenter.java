@@ -56,7 +56,6 @@ public class GifListPresenter implements GifListContract.Presenter {
     @Override
     public void takeView(GifListContract.View view) {
         this.view = view;
-        fetchTrendingGifs();
         fetchRankedGifsFromFirebase();
     }
 
@@ -89,11 +88,15 @@ public class GifListPresenter implements GifListContract.Presenter {
                             , firebaseGif.getAverageRating(), firebaseGif.getRatingCount());
                     rankedGifItems.add(adapterGifItem);
                 }
+
+                // Fetch trending gifs only after the data from firebase is available.
+                fetchTrendingGifs();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Do nothing.
+                // Fetch trending gifs anyways.
+                fetchTrendingGifs();
             }
         });
     }
@@ -142,8 +145,7 @@ public class GifListPresenter implements GifListContract.Presenter {
 
                         if (responseGifs != null) {
                             populateUnrankedGifItems();
-                            // Because ranking doesn't apply to trending gifs.
-                            finalizedGifItems.addAll(unRankedGifItems);
+                            populateFinalizedSearchedGifItems();
                             updateGifsRecyclerView();
                         }
                     }

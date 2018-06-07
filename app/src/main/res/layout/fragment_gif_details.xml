@@ -30,7 +30,7 @@
             android:id="@+id/tv_title"
             style="@style/GifDetailsScreenFieldValuesStyle"
             android:layout_toEndOf="@+id/label_title"
-            tools:text="Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title  Gif title Gif title Gif title Gif title Gif title Gif title Gif title " />
+            tools:text="Gif title" />
 
         <TextView
             android:id="@+id/label_rating"

@@ -2,6 +2,9 @@ package tarun.example.com.gifsearchengine.ui.gifDetails;
 
 import android.text.TextUtils;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 import tarun.example.com.gifsearchengine.data.Constants;
 import tarun.example.com.gifsearchengine.data.DataManager;
 import tarun.example.com.gifsearchengine.data.DataManagerImpl;
@@ -70,10 +73,40 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
         if (rating > 0) {
             // Increment the rating count by 1, find the new average rating and then write the updated object to Firebase DB.
             int newRatingCount = adapterGifItem.getRatingCount() + 1;
-            float newAverageRating = (adapterGifItem.getAverageRating() + rating)/newRatingCount;
+            float newAverageRating = ((adapterGifItem.getAverageRating() * adapterGifItem.getRatingCount()) + rating)/newRatingCount;
+            newAverageRating = getRoundedRating(newAverageRating);
+
+            // Update the gif item.
+            gif.setAverageRating(newAverageRating);
+            gif.setRatingCount(newRatingCount);
+
             dataManager.addOrUpdateGif(new FirebaseGif(adapterGifItem.getId(), newAverageRating, newRatingCount, adapterGifItem.getPreviewUrl()));
+
+            // Reload gif rating.
+            refreshRatingInUI();
         } else {
             view.showInvalidRatingErrorMessage();
+        }
+    }
+
+    /**
+     * Round the rating to one decimal place.
+     */
+    private float getRoundedRating(float averageRating) {
+        DecimalFormat df = new DecimalFormat("#.#");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return Float.valueOf(df.format(averageRating));
+    }
+
+    /**
+     * Refresh rating data in UI.
+     */
+    private void refreshRatingInUI() {
+        // Send rating as "Not Rated" if current rating is 0 for this gif, otherwise send the current average rating.
+        if (gif.getAverageRating() > 0) {
+            view.populateGifDetails(String.valueOf(gif.getAverageRating()));
+        } else {
+            view.populateGifDetails("Not Rated");
         }
     }
 
