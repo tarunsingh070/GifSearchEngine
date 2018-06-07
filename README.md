@@ -15,6 +15,10 @@ A simple Gif search engine to search various gifs based on the keywords you type
 * Pagination support.
 * Unit tests.
 
+### Architecture
+
+This Project follows the Model-View-Presenter architecture.
+
 ### Libraries
 * OkHttp3 for REST api communication
 * Glide for image loading
