@@ -19,15 +19,13 @@ public interface GifListContract {
 
         boolean isViewVisible();
 
-        void showProgress();
-
-        void hideProgress();
-
         void updateGifsListAdapterData(List<AdapterGifItem> gifs);
 
         void setSortingDropDownVisibility(boolean visibility);
 
         void setActivityTitle(String title);
+
+        void showErrorMessage(Exception exception);
 
     }
 

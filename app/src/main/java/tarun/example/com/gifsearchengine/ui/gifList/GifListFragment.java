@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -30,6 +32,8 @@ import tarun.example.com.gifsearchengine.util.KeyboardUtils;
 
 /**
  * This fragment defines the UI to show the Gifs in a grid view format.
+ *
+ * Todo: Add support for pagination using the Google Paging Library.
  */
 public class GifListFragment extends Fragment implements GifListContract.View, GifsListAdapter.ItemClickListener {
 
@@ -41,7 +45,6 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     private OnGifListClickedListener mListener;
     private GifListContract.Presenter presenter;
     private RecyclerView gifsRecyclerView;
-    private MenuItem searchMenuItem;
     private MenuItem sortMenuItem;
 
     SearchView searchView;
@@ -99,7 +102,7 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         inflater.inflate(R.menu.menu_gif_list, menu);
 
         // Get searchView and add a text listener on it to perform search.
-        searchMenuItem = menu.findItem( R.id.action_search);
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchMenuItem.getActionView();
         searchView.setOnQueryTextListener(getSearchTextListener());
 
@@ -182,16 +185,6 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     }
 
     @Override
-    public void showProgress() {
-        //Todo: Show progress bar.
-    }
-
-    @Override
-    public void hideProgress() {
-        //Todo: Hide progress bar.
-    }
-
-    @Override
     public FragmentActivity getFragmentActivity() {
         return getActivity();
     }
@@ -221,6 +214,12 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     public void onDestroyView() {
         super.onDestroyView();
         presenter.dropView();
+    }
+
+    @Override
+    public void showErrorMessage(Exception exception) {
+        Log.e(TAG, exception.toString());
+        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -48,7 +48,6 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     private TextView tvHeight;
     private TextView tvWidth;
     private TextView tvSize;
-    private Button rateMeButton;
 
     private GifDetailsContract.Presenter presenter;
 
@@ -104,7 +103,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         tvHeight = rootView.findViewById(R.id.tv_height);
         tvWidth = rootView.findViewById(R.id.tv_width);
         tvSize = rootView.findViewById(R.id.tv_size);
-        rateMeButton = rootView.findViewById(R.id.button_rate);
+        Button rateMeButton = rootView.findViewById(R.id.button_rate);
         rateMeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

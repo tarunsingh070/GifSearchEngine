@@ -43,6 +43,7 @@ public class GifsActivity extends AppCompatActivity implements GifListFragment.O
     public void onGifClicked(AdapterGifItem gif) {
         Fragment gifDetailsFragment = GifDetailsFragment.newInstance(gif);
         manager.beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left)
                 .replace(R.id.fragment_container, gifDetailsFragment, GifDetailsFragment.TAG)
                 .addToBackStack(GifDetailsFragment.TAG)
                 .commit();

@@ -111,7 +111,6 @@ public class GifListPresenter implements GifListContract.Presenter {
      * @return
      */
     private Callback getTrendingGifsCallback() {
-        view.showProgress();
         return new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -119,9 +118,7 @@ public class GifListPresenter implements GifListContract.Presenter {
                     return;
                 }
 
-                // Todo: Handle error.
-
-                view.hideProgress();
+                view.showErrorMessage(e);
             }
 
             @Override
@@ -129,8 +126,6 @@ public class GifListPresenter implements GifListContract.Presenter {
                 if (!view.isViewVisible()) {
                     return;
                 }
-
-                view.hideProgress();
 
                 /*
                 If response is successful and returns a non-empty data, then use Gson library to get
@@ -175,7 +170,6 @@ public class GifListPresenter implements GifListContract.Presenter {
      * @return
      */
     private Callback getSearchedGifsCallback() {
-        view.showProgress();
         return new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -183,7 +177,7 @@ public class GifListPresenter implements GifListContract.Presenter {
                     return;
                 }
 
-                view.hideProgress();
+                view.showErrorMessage(e);
             }
 
             @Override
@@ -191,8 +185,6 @@ public class GifListPresenter implements GifListContract.Presenter {
                 if (view == null || !view.isViewVisible()) {
                     return;
                 }
-
-                view.hideProgress();
 
                 /*
                 If response is successful and returns a non-empty data, then use Gson library to get
@@ -274,7 +266,7 @@ public class GifListPresenter implements GifListContract.Presenter {
 
     /**
      * Method to handle changes in search queries.
-     * @param query
+     * @param query The query string to be searched.
      */
     @Override
     public void searchQueryChanged(String query) {
