@@ -1,8 +1,6 @@
 package tarun.example.com.gifsearchengine.data;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import okhttp3.Callback;
@@ -42,9 +40,7 @@ public class DataManagerImpl implements DataManager {
 
     @Override
     public void getRankedGifsFromFirebase(ValueEventListener listener) {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Constants.PATH_GIFS);
-
-        ref.addListenerForSingleValueEvent(listener);
+        firebaseDbHelper.getRankedGifsFromFirebase(listener);
     }
 
 }

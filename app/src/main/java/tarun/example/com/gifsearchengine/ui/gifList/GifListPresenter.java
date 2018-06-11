@@ -1,9 +1,13 @@
 package tarun.example.com.gifsearchengine.ui.gifList;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.GsonBuilder;
 
@@ -29,6 +33,8 @@ import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
  * view ({@link GifListFragment}) to be displayed.
  */
 public class GifListPresenter implements GifListContract.Presenter {
+
+    private static final String TAG = GifListPresenter.class.getSimpleName();
 
     private int sortBySelectedOptionPosition;
     private GifListContract.View view;
@@ -56,7 +62,7 @@ public class GifListPresenter implements GifListContract.Presenter {
     @Override
     public void takeView(GifListContract.View view) {
         this.view = view;
-        fetchRankedGifsFromFirebase();
+        fetchRankedGifsRealtimeDataFromFirebase();
     }
 
     @Override
@@ -65,46 +71,115 @@ public class GifListPresenter implements GifListContract.Presenter {
     }
 
     /**
-     * Fetch the list of ranked Gifs from Firebase database.
+     * Fetch the real-time data containing list of ranked Gifs from Firebase database.
      */
-    private void fetchRankedGifsFromFirebase() {
-        dataManager.getRankedGifsFromFirebase(new ValueEventListener() {
+    private void fetchRankedGifsRealtimeDataFromFirebase() {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Constants.PATH_GIFS);
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (view == null || !view.isViewVisible()) {
-                    return;
-                }
-
-                List<FirebaseGif> rankedFirebaseGifs = new ArrayList<>();
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                    FirebaseGif firebaseGif = snapshot.getValue(FirebaseGif.class);
-                    rankedFirebaseGifs.add(firebaseGif);
-                }
-
-                // Create adapterGifItems to be used for adapter from each firebaseGif object received.
-                rankedGifItems.clear();
-                for (FirebaseGif firebaseGif: rankedFirebaseGifs) {
-                    AdapterGifItem adapterGifItem = new AdapterGifItem(firebaseGif.getId(), firebaseGif.getPreviewUrl()
-                            , firebaseGif.getAverageRating(), firebaseGif.getRatingCount());
-                    rankedGifItems.add(adapterGifItem);
-                }
-
-                // Fetch trending gifs only after the data from firebase is available.
+                // Fetch trending gifs once all the data from firebase has been fetched.
+                Log.d(TAG, "Fetched all " + dataSnapshot.getChildrenCount() + " items from firebase");
                 fetchTrendingGifs();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "Error occurred while fetching items from firebase db", databaseError.toException());
                 // Fetch trending gifs anyways.
                 fetchTrendingGifs();
             }
         });
+
+        // Clear the previous items before re-populating data.
+        rankedGifItems.clear();
+        ref.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                FirebaseGif firebaseGif = dataSnapshot.getValue(FirebaseGif.class);
+                // Add item only if URL is non-empty.
+                if (!TextUtils.isEmpty(firebaseGif.getPreviewUrl())) {
+                    addInRankedGifItems(firebaseGif);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                FirebaseGif firebaseGif = dataSnapshot.getValue(FirebaseGif.class);
+                // When an item is updated in firebase db, update the local item as well.
+                updateRankedGifItems(firebaseGif);
+                updateFinalizedGifItems(firebaseGif);
+                setGifItemsOrdering();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                // This scenario will never happen.
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                // Do nothing
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Do nothing.
+            }
+        });
+    }
+
+    /**
+     * Add the firebase item into the list of ranked gif items.
+     * @param firebaseGif Firebase gif item to be added.
+     */
+    private void addInRankedGifItems(FirebaseGif firebaseGif) {
+        // Create an AdapterGifItem instance to be used in adapter from this firebaseGif item received.
+        AdapterGifItem adapterGifItem = new AdapterGifItem(firebaseGif.getId(), firebaseGif.getPreviewUrl()
+                , firebaseGif.getAverageRating(), firebaseGif.getRatingCount());
+
+        rankedGifItems.add(adapterGifItem);
+    }
+
+    /**
+     * Update an existing gif item in the list of ranked gif items when an item is updated in firebase db.
+     * @param firebaseGif Updated firebase gif item.
+     */
+    private void updateRankedGifItems(FirebaseGif firebaseGif) {
+        for (AdapterGifItem adapterGifItem : rankedGifItems) {
+            if (TextUtils.equals(firebaseGif.getId(), adapterGifItem.getId())) {
+                // Since Gif ID and Url will always remain same for a gif so, Average rating and
+                // rating count are the only fields that can be updated in firebase db.
+                adapterGifItem.setAverageRating(firebaseGif.getAverageRating());
+                adapterGifItem.setRatingCount(firebaseGif.getRatingCount());
+            }
+        }
+    }
+
+    /**
+     * Update an existing gif item being shown when an item is updated in firebase db.
+     * @param firebaseGif Updated firebase gif item.
+     */
+    private void updateFinalizedGifItems(FirebaseGif firebaseGif) {
+        for (AdapterGifItem adapterGifItem : finalizedGifItems) {
+            if (TextUtils.equals(firebaseGif.getId(), adapterGifItem.getId())) {
+                // Since Gif ID and Url will always remain same for a gif so, Average rating and
+                // rating count are the only fields that can be updated in firebase db.
+                adapterGifItem.setAverageRating(firebaseGif.getAverageRating());
+                adapterGifItem.setRatingCount(firebaseGif.getRatingCount());
+            }
+        }
     }
 
     /**
      * Fetch the list of trending Gifs from Giphy api and update title of activity.
      */
     private void fetchTrendingGifs() {
+        // Reset the sorting option to sort by relevance when Trending gifs are searched so that when
+        // user searches for gifs later, then sorting is set back to based on relevance by default.
+        sortBySelectedOptionPosition = GifListFragment.SPINNER_OPTION_RELEVANCE_POSITION;
+
         dataManager.getTrendingGifs(getTrendingGifsCallback());
         view.setActivityTitle(Constants.ACTIVITY_TITLE_TRENDING);
     }
@@ -126,7 +201,7 @@ public class GifListPresenter implements GifListContract.Presenter {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (!view.isViewVisible()) {
+                if (view == null || !view.isViewVisible()) {
                     return;
                 }
 
@@ -146,7 +221,6 @@ public class GifListPresenter implements GifListContract.Presenter {
                         if (responseGifs != null) {
                             populateUnrankedGifItems();
                             populateFinalizedSearchedGifItems();
-                            updateGifsRecyclerView();
                         }
                     }
                 }
@@ -161,9 +235,14 @@ public class GifListPresenter implements GifListContract.Presenter {
     private void populateUnrankedGifItems() {
         unRankedGifItems.clear();
         for (Gif gif: responseGifs.getGifs()) {
-            AdapterGifItem gifItem = new AdapterGifItem(gif.getId(), gif.getUserName(), gif.getImportDate()
-                    ,gif.getTitle(), gif.getImages().getPreviewGif().getUrl(), gif.getImages().getFullGif());
-            unRankedGifItems.add(gifItem);
+            String previewUrl = gif.getImages().getPreviewGif().getUrl();
+            String fullUrl = gif.getImages().getFullGif().getUrl();
+            // Add item only if URLs are non-empty.
+            if (!(TextUtils.isEmpty(previewUrl) || TextUtils.isEmpty(fullUrl))){
+                AdapterGifItem gifItem = new AdapterGifItem(gif.getId(), gif.getUserName(), gif.getImportDate()
+                        , gif.getTitle(), gif.getImages().getPreviewGif().getUrl(), gif.getImages().getFullGif());
+                unRankedGifItems.add(gifItem);
+            }
         }
     }
 
@@ -204,7 +283,6 @@ public class GifListPresenter implements GifListContract.Presenter {
                         if (responseGifs != null) {
                             populateUnrankedGifItems();
                             populateFinalizedSearchedGifItems();
-                            updateGifsRecyclerView();
                         }
                     }
                 }
@@ -217,6 +295,11 @@ public class GifListPresenter implements GifListContract.Presenter {
      * because this method is being called from a background thread (Callback thread).
      */
     private void updateGifsRecyclerView() {
+        // Verify if the view is still attached.
+        if (view == null || !view.isViewVisible()) {
+            return;
+        }
+
         view.getFragmentActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -260,10 +343,18 @@ public class GifListPresenter implements GifListContract.Presenter {
             finalizedGifItems.addAll(unRankedGifItems);
         }
 
+        setGifItemsOrdering();
+    }
+
+    /**
+     * Order the gif items based on the sorting option selected before being displayed to the user.
+     */
+    private void setGifItemsOrdering() {
         // If the currently selected sort option is by Ranking, then sort the list as per each Gif's rating.
         if (sortBySelectedOptionPosition == GifListFragment.SPINNER_OPTION_RANKING_POSITION) {
             Collections.sort(finalizedGifItems);
         }
+        updateGifsRecyclerView();
     }
 
     /**
@@ -302,7 +393,6 @@ public class GifListPresenter implements GifListContract.Presenter {
     public void sortByOptionUpdated(int position) {
         sortBySelectedOptionPosition = position;
         populateFinalizedSearchedGifItems();
-        updateGifsRecyclerView();
     }
 
 }

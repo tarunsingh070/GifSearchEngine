@@ -1,7 +1,9 @@
 package tarun.example.com.gifsearchengine.data.remote.firebase;
 
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import tarun.example.com.gifsearchengine.data.Constants;
 import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
@@ -19,5 +21,12 @@ public class FirebaseDbHelperImpl implements FirebaseDbHelper {
                 .child(Constants.PATH_GIFS)
                 .child(firebaseGif.getId())
                 .setValue(firebaseGif);
+    }
+
+    @Override
+    public void getRankedGifsFromFirebase(ValueEventListener listener) {
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(Constants.PATH_GIFS);
+
+        ref.addListenerForSingleValueEvent(listener);
     }
 }
