@@ -23,6 +23,8 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:cardview-v7:27.1.1'
 
     // Dependency for OkHttp3 library.
     implementation "com.squareup.okhttp3:okhttp:$rootProject.okhttpVersion"
@@ -36,6 +38,9 @@ dependencies {
 
     // Dependency for Firebase Realtime DB
     implementation "com.google.firebase:firebase-database:$rootProject.firebaseDatabaseVersion"
+
+    // Dependency for Google Paging library.
+    implementation "android.arch.paging:runtime:$rootProject.pagingVersion"
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:$rootProject.ext.junitVersion"

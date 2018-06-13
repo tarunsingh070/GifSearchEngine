@@ -1,4 +1,4 @@
-package tarun.example.com.gifsearchengine.data.model;
+package tarun.example.com.gifsearchengine.data.model.giphy;
 
 /**
  * Model class for storing information related to a preview sized gif object.

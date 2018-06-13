@@ -5,6 +5,7 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import tarun.example.com.gifsearchengine.data.Constants;
 
 /**
  * A simple Rest client class which would help make Rest calls to various Giphy APIs.
@@ -17,7 +18,6 @@ public class GiphyRestClient {
     private static final String URL_TRENDING_GIFS = "v1/gifs/trending";
     private static final String URL_SEARCH_GIFS = "v1/gifs/search";
     private static final String GIPHY_API_KEY = "tKSHo2xJBooBR7H2o7AYdl4hu6YRF7Wf";
-    private static final String RECORDS_PAGE_SIZE = "30";
 
     private OkHttpClient client = new OkHttpClient();
 
@@ -37,31 +37,35 @@ public class GiphyRestClient {
         return new HttpUrl.Builder()
                 .scheme("https")
                 .host(BASE_URL)
-                .addQueryParameter("limit", RECORDS_PAGE_SIZE)
+                .addQueryParameter("limit", String.valueOf(Constants.LOADING_PAGE_SIZE))
                 .addEncodedQueryParameter("api_key", GIPHY_API_KEY);
     }
 
     /**
-     * Method to get the list of Trending gifs.
-     * @param callback Callback object where the response is desired to be received.
+     * Get trending gif results starting from the offset value passed in as argument.
+     * @param offset Offset value from where results should be retrieved.
+     * @param callback Callback where response is to be received.
      */
-    public void getTrendingGifs(Callback callback) {
+    public void getTrendingGifs(int offset, Callback callback) {
         HttpUrl httpUrl = getBaseUrlBuilder()
                 .addPathSegments(URL_TRENDING_GIFS)
+                .addQueryParameter("offset", String.valueOf(offset))
                 .build();
 
         makeGetRequest(httpUrl, callback);
     }
 
     /**
-     * Method to get the list of Searched gifs as per the search term.
-     * @param searchTerm Term related to which the Gifs are desired to be returned.
-     * @param callback Callback object where the response is desired to be received.
+     * Get searched gif results according to the searchTerm starting from the offset value passed in as argument.
+     * @param searchTerm Term to be searched for gifs.
+     * @param offset Offset value from where results should be retrieved.
+     * @param callback Callback where search results are to be received.
      */
-    public void getSearchedGifs(String searchTerm, Callback callback) {
+    public void getSearchedGifs(String searchTerm, int offset, Callback callback) {
         HttpUrl httpUrl = getBaseUrlBuilder()
                 .addPathSegments(URL_SEARCH_GIFS)
                 .addQueryParameter("q", searchTerm)
+                .addQueryParameter("offset", String.valueOf(offset))
                 .build();
 
         makeGetRequest(httpUrl, callback);

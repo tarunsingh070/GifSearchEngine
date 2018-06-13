@@ -1,4 +1,4 @@
-package tarun.example.com.gifsearchengine.data.model;
+package tarun.example.com.gifsearchengine.data.model.giphy;
 
 import com.google.gson.annotations.SerializedName;
 

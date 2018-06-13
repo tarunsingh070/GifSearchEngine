@@ -1,6 +1,6 @@
 package tarun.example.com.gifsearchengine.ui.gifList;
 
-import android.content.Context;
+import android.arch.paging.PagedListAdapter;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -12,50 +12,36 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import tarun.example.com.gifsearchengine.R;
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
 
-public class GifsListAdapter extends RecyclerView.Adapter<GifsListAdapter.ViewHolder> {
+/**
+ * The Adapter class of type {@link PagedListAdapter} which provides pagination support while loading
+ * and displaying the list of gifs to the user.
+ */
+public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, GifsDataSourceListAdapter.ViewHolder> {
 
-    private List<AdapterGifItem> gifs;
-    private Context context;
+    private static final String TAG = GifsDataSourceListAdapter.class.getSimpleName();
+
     private ItemClickListener itemClickListener;
 
-    GifsListAdapter(Context context, ItemClickListener itemClickListener) {
-        this.context = context;
-        gifs = new ArrayList<>();
+    GifsDataSourceListAdapter(ItemClickListener itemClickListener) {
+        super(AdapterGifItem.DIFF_CALLBACK);
         this.itemClickListener = itemClickListener;
     }
 
     // inflates the cell layout from xml when needed
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_gif, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gif, parent, false);
         return new ViewHolder(view);
     }
 
     // Calls the bind method of viewholder to bind the data to various views in each cell.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(gifs.get(position));
-    }
-
-    // total number of cells.
-    @Override
-    public int getItemCount() {
-        return gifs.size();
-    }
-
-    /**
-     * Helper method to update the dataset of adapter.
-     * @param gifs Latest list of Gifs.
-     */
-    public void setGifs(List<AdapterGifItem> gifs) {
-        this.gifs = gifs;
+        holder.bind(getItem(position));
     }
 
     /**
@@ -83,8 +69,8 @@ public class GifsListAdapter extends RecyclerView.Adapter<GifsListAdapter.ViewHo
          */
         void loadGif(String url) {
             if (!TextUtils.isEmpty(url)) {
-                CircularProgressDrawable progressPlaceHolder = ProgressBarUtils.getCircularProgressPlaceholder(context);
-                Glide.with(context)
+                CircularProgressDrawable progressPlaceHolder = ProgressBarUtils.getCircularProgressPlaceholder(ivGif.getContext());
+                Glide.with(ivGif.getContext())
                         .asGif()
                         .load(url)
                         .apply(new RequestOptions()
@@ -96,7 +82,7 @@ public class GifsListAdapter extends RecyclerView.Adapter<GifsListAdapter.ViewHo
         @Override
         public void onClick(View view) {
             if (itemClickListener != null) {
-                itemClickListener.onItemClick(gifs.get(getAdapterPosition()));
+                itemClickListener.onItemClick(getItem(getAdapterPosition()));
             }
         }
     }

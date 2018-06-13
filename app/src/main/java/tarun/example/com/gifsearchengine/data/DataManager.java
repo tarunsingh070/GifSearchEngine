@@ -1,6 +1,6 @@
 package tarun.example.com.gifsearchengine.data;
 
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.ValueEventListener;
 
 import okhttp3.Callback;
@@ -12,12 +12,18 @@ import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
  */
 public interface DataManager {
 
+    void getTrendingGifs(int offset, Callback callback);
+
     void getTrendingGifs(Callback callback);
+
+    void getSearchedGifs(String searchTerm, int  offset, Callback callback);
 
     void getSearchedGifs(String searchTerm, Callback callback);
 
-    Task<Void> addOrUpdateGif(FirebaseGif firebaseGif);
+    void addOrUpdateGif(FirebaseGif firebaseGif);
 
     void getRankedGifsFromFirebase(ValueEventListener listener);
+
+    void getRankedGifsFromFirebase(ChildEventListener listener);
 
 }

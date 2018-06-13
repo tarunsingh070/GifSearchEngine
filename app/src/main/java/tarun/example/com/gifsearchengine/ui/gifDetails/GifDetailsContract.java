@@ -1,6 +1,6 @@
 package tarun.example.com.gifsearchengine.ui.gifDetails;
 
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.ui.BasePresenter;
 
 /**
@@ -16,6 +16,8 @@ public class GifDetailsContract {
         void populateGifDetails(String averageRating);
 
         void showInvalidRatingErrorMessage();
+
+        void setDefaultActivityTitle();
 
         void setActivityTitle(String title);
 

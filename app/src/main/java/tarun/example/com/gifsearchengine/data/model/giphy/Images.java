@@ -1,4 +1,4 @@
-package tarun.example.com.gifsearchengine.data.model;
+package tarun.example.com.gifsearchengine.data.model.giphy;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -12,7 +12,6 @@ public class Images {
 
     @SerializedName("fixed_width")
     private FullGif fullGif;
-
 
     public PreviewGif getPreviewGif() {
         return previewGif;

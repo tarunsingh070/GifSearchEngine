@@ -4,6 +4,7 @@ package tarun.example.com.gifsearchengine.ui.gifDetails;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.app.AlertDialog;
@@ -25,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import tarun.example.com.gifsearchengine.R;
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
 import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 
@@ -45,8 +46,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     private TextView tvRating;
     private TextView tvUploader;
     private TextView tvUploadDate;
-    private TextView tvHeight;
-    private TextView tvWidth;
+    private TextView tvDimension;
     private TextView tvSize;
 
     private GifDetailsContract.Presenter presenter;
@@ -86,6 +86,12 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     }
 
     @Override
+    public void setDefaultActivityTitle() {
+        // Set App name as title.
+        getActivity().setTitle(R.string.app_name);
+    }
+
+    @Override
     public void setActivityTitle(String title) {
         getActivity().setTitle(title);
     }
@@ -100,11 +106,10 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         tvTitle = rootView.findViewById(R.id.tv_title);
         tvRating = rootView.findViewById(R.id.tv_rating);
         tvUploadDate = rootView.findViewById(R.id.tv_upload_date);
-        tvHeight = rootView.findViewById(R.id.tv_height);
-        tvWidth = rootView.findViewById(R.id.tv_width);
+        tvDimension = rootView.findViewById(R.id.tv_dimension);
         tvSize = rootView.findViewById(R.id.tv_size);
-        Button rateMeButton = rootView.findViewById(R.id.button_rate);
-        rateMeButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fabRateMeButton = rootView.findViewById(R.id.fab_rate);
+        fabRateMeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showRatingDialog();
@@ -196,8 +201,8 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         tvRating.setText(averageRating);
         tvUploader.setText(gif.getUserName());
         tvUploadDate.setText(getFormattedDate(gif.getImportDate()));
-        tvHeight.setText(getString(R.string.formatted_dimension_with_unit_px, gif.getFullGif().getHeight()));
-        tvWidth.setText(getString(R.string.formatted_dimension_with_unit_px, gif.getFullGif().getWidth()));
+        tvDimension.setText(getString(R.string.formatted_dimensions, gif.getFullGif().getHeight()
+                , gif.getFullGif().getWidth()));
         tvSize.setText(getString(R.string.formatted_size_with_unit_kb, gif.getFullGif().getSize()));
     }
 

@@ -1,16 +1,17 @@
 package tarun.example.com.gifsearchengine.ui.gifList;
 
-
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.paging.PagedList;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,23 +20,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.util.List;
-
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.Constants;
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.remote.giphy.GifsDataSource;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.NetworkState;
 import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsFragment;
+import tarun.example.com.gifsearchengine.util.HttpUtil;
 import tarun.example.com.gifsearchengine.util.KeyboardUtils;
+import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
 
 /**
  * This fragment defines the UI to show the Gifs in a grid view format.
- *
- * Todo: Add support for pagination using the Google Paging Library.
  */
-public class GifListFragment extends Fragment implements GifListContract.View, GifsListAdapter.ItemClickListener {
+public class GifListFragment extends Fragment implements GifListContract.View, GifsDataSourceListAdapter.ItemClickListener {
 
     public static final String TAG = GifListFragment.class.getSimpleName();
     public static final int SPINNER_OPTION_RELEVANCE_POSITION = 0;
@@ -46,10 +48,10 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     private GifListContract.Presenter presenter;
     private RecyclerView gifsRecyclerView;
     private MenuItem sortMenuItem;
+    private GifsDataSourceListAdapter gifsDataSourceListAdapter;
 
     SearchView searchView;
-
-    private GifsListAdapter gifsListAdapter;
+    Button retryButton;
 
     public GifListFragment() {
         // Required empty public constructor
@@ -75,7 +77,7 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle(Constants.ACTIVITY_TITLE_TRENDING);
+        getActivity().setTitle(R.string.title_trending);
     }
 
     @Override
@@ -84,7 +86,13 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_gif_list, container, false);
         gifsRecyclerView = rootView.findViewById(R.id.rv_gifs);
-
+        retryButton = rootView.findViewById(R.id.button_retry);
+        retryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.retryButtonClicked();
+            }
+        });
         return rootView;
     }
 
@@ -157,9 +165,47 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         sortMenuItem.setVisible(visibility);
     }
 
+    /**
+     * Register the data source factory live data by setting an observer to observe any changes
+     * in the live data (list of gifs) made from data source.
+     * @param gifsDataSourceMutableLiveData The Gifs Live data list to be observed for changes.
+     */
     @Override
-    public void setActivityTitle(String title) {
-        getActivity().setTitle(title);
+    public void registerDataSourceFactoryUpdate(MutableLiveData<GifsDataSource> gifsDataSourceMutableLiveData) {
+        gifsDataSourceMutableLiveData.observe(this, new Observer<GifsDataSource>() {
+            @Override
+            public void onChanged(@Nullable GifsDataSource gifsDataSource) {
+                registerGifDataSourceObservers(gifsDataSource);
+            }
+        });
+    }
+
+    /**
+     * Register observers to observe the various states of Initial loading and Range loading.
+     */
+    private void registerGifDataSourceObservers(GifsDataSource gifsDataSource) {
+        gifsDataSource.getInitialLoading().observe(this, new Observer<NetworkState>() {
+            @Override
+            public void onChanged(@Nullable NetworkState networkState) {
+                if (networkState == NetworkState.LOADING) {
+                    ProgressBarUtils.showProgressBarCenter(getActivity());
+                } else {
+                    ProgressBarUtils.hideProgressBarCenter(getActivity());
+                }
+            }
+        });
+
+        gifsDataSource.getNetworkState().observe(this, new Observer<NetworkState>() {
+            @Override
+            public void onChanged(@Nullable NetworkState networkState) {
+                // FixMe: Find a way to show this loader only after initial loading.
+                if (networkState == NetworkState.LOADING && gifsDataSourceListAdapter.getItemCount() > Constants.LOADING_PAGE_SIZE) {
+                    ProgressBarUtils.showProgressBarBottom(getActivity());
+                } else {
+                    ProgressBarUtils.hideProgressBarBottom(getActivity());
+                }
+            }
+        });
     }
 
     @Override
@@ -184,19 +230,18 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         mListener = null;
     }
 
-    @Override
-    public FragmentActivity getFragmentActivity() {
-        return getActivity();
-    }
-
     /**
-     * Update and refresh the recycler view and adapter as per the data received.
-     * @param gifItems The latest set of Gif items to be displayed to user.
+     * Bind the {@link PagedList} to be displayed to the recycler view.
+     * @param gifsPagedList The list of Gif items to be observed and displayed to the user.
      */
     @Override
-    public void updateGifsListAdapterData(List<AdapterGifItem> gifItems) {
-        gifsListAdapter.setGifs(gifItems);
-        gifsListAdapter.notifyDataSetChanged();
+    public void bindGifsListAdapterData(LiveData<PagedList<AdapterGifItem>> gifsPagedList) {
+        gifsPagedList.observe(this, new Observer<PagedList<AdapterGifItem>>() {
+            @Override
+            public void onChanged(@Nullable PagedList<AdapterGifItem> pagedList) {
+                gifsDataSourceListAdapter.submitList(pagedList);
+            }
+        });
     }
 
     /**
@@ -204,10 +249,9 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
      */
     private void setupGifsRecyclerView() {
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), NO_OF_COLUMNS);
-
-        gifsListAdapter = new GifsListAdapter(getContext(), this);
+        gifsDataSourceListAdapter = new GifsDataSourceListAdapter(this);
         gifsRecyclerView.setLayoutManager(gridLayoutManager);
-        gifsRecyclerView.setAdapter(gifsListAdapter);
+        gifsRecyclerView.setAdapter(gifsDataSourceListAdapter);
     }
 
     @Override
@@ -217,9 +261,24 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     }
 
     @Override
-    public void showErrorMessage(Exception exception) {
-        Log.e(TAG, exception.toString());
-        Toast.makeText(getContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+    public void showOrHideRetryButton(boolean shouldShow) {
+        int visibility = shouldShow ? View.VISIBLE : View.GONE;
+        retryButton.setVisibility(visibility);
+    }
+
+    @Override
+    public void showErrorMessage(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean isNetworkConnectivityAvailable() {
+        return HttpUtil.isNetworkAvailable(getContext());
+    }
+
+    @Override
+    public void showNetworkConnectivityError() {
+        showErrorMessage(getString(R.string.no_connection_message));
     }
 
     @Override
@@ -235,5 +294,4 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     public interface OnGifListClickedListener {
         void onGifClicked(AdapterGifItem gif);
     }
-
 }

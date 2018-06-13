@@ -1,6 +1,6 @@
 package tarun.example.com.gifsearchengine.data;
 
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.ValueEventListener;
 
 import okhttp3.Callback;
@@ -23,24 +23,70 @@ public class DataManagerImpl implements DataManager {
         firebaseDbHelper = new FirebaseDbHelperImpl();
     }
 
+    /**
+     * Get trending gif results starting from beginning of results.
+     * @param callback Callback where response is to be received.
+     */
     @Override
     public void getTrendingGifs(Callback callback) {
-        restClient.getTrendingGifs(callback);
+        restClient.getTrendingGifs(0, callback);
     }
 
+    /**
+     * Get trending gif results starting from an offset rather than from beginning.
+     * @param offset Offset value from where results should be retrieved.
+     * @param callback Callback where response is to be received.
+     */
+    @Override
+    public void getTrendingGifs(int offset, Callback callback) {
+        restClient.getTrendingGifs(offset, callback);
+    }
+
+    /**
+     * Get searched gif results according to the searchTerm starting from beginning of results.
+     * @param searchTerm Term to be searched for gifs.
+     * @param callback Callback where search results are to be received.
+     */
     @Override
     public void getSearchedGifs(String searchTerm, Callback callback) {
-        restClient.getSearchedGifs(searchTerm, callback);
+        restClient.getSearchedGifs(searchTerm, 0, callback);
     }
 
+    /**
+     * Get searched gif results according to the searchTerm starting from an offset rather than from beginning.
+     * @param searchTerm Term to be searched for gifs.
+     * @param offset Offset value from where results should be retrieved.
+     * @param callback Callback where search results are to be received.
+     */
     @Override
-    public Task<Void> addOrUpdateGif(FirebaseGif firebaseGif) {
-        return firebaseDbHelper.addOrUpdateGif(firebaseGif);
+    public void getSearchedGifs(String searchTerm, int  offset, Callback callback) {
+        restClient.getSearchedGifs(searchTerm, offset, callback);
     }
 
+    /**
+     * Add a new gif object or update an existing one in the firebase database.
+     * @param firebaseGif Firebase gif object to be stored.
+     */
+    @Override
+    public void addOrUpdateGif(FirebaseGif firebaseGif) {
+        firebaseDbHelper.addOrUpdateGif(firebaseGif);
+    }
+
+    /**
+     * Get the list of all ranked gifs from the firebase database.
+     * @param listener
+     */
     @Override
     public void getRankedGifsFromFirebase(ValueEventListener listener) {
         firebaseDbHelper.getRankedGifsFromFirebase(listener);
     }
 
+    /**
+     * Get the list of all ranked gifs from the firebase database.
+     * @param listener
+     */
+    @Override
+    public void getRankedGifsFromFirebase(ChildEventListener listener) {
+        firebaseDbHelper.getRankedGifsFromFirebase(listener);
+    }
 }

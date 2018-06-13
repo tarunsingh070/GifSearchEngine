@@ -1,4 +1,4 @@
-package tarun.example.com.gifsearchengine.data.model;
+package tarun.example.com.gifsearchengine.data.model.giphy;
 
 import android.os.Parcel;
 import android.os.Parcelable;

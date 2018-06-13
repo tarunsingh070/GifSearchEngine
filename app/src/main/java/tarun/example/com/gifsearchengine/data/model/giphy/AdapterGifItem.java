@@ -1,8 +1,11 @@
-package tarun.example.com.gifsearchengine.data.model;
+package tarun.example.com.gifsearchengine.data.model.giphy;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
+
+import java.util.Objects;
 
 /**
  * Model class for storing all relevant information related to a gif object to be displayed.
@@ -24,6 +27,18 @@ public class AdapterGifItem implements Parcelable, Comparable<AdapterGifItem> {
     private float averageRating;
 
     private int ratingCount;
+
+    public static DiffUtil.ItemCallback<AdapterGifItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<AdapterGifItem>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull AdapterGifItem oldItem, @NonNull AdapterGifItem newItem) {
+            return oldItem.id.equals(newItem.id);
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull AdapterGifItem oldItem, @NonNull AdapterGifItem newItem) {
+            return oldItem.previewUrl.equals(newItem.previewUrl);
+        }
+    };
 
     public AdapterGifItem(String id, String userName, String importDate, String title
             , String previewUrl, FullGif fullGif) {
@@ -148,7 +163,12 @@ public class AdapterGifItem implements Parcelable, Comparable<AdapterGifItem> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AdapterGifItem && id.equals(((AdapterGifItem) obj).id);
+        return obj instanceof AdapterGifItem && Objects.equals(id, ((AdapterGifItem) obj).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     @Override

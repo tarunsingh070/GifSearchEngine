@@ -5,10 +5,9 @@ import android.text.TextUtils;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-import tarun.example.com.gifsearchengine.data.Constants;
 import tarun.example.com.gifsearchengine.data.DataManager;
 import tarun.example.com.gifsearchengine.data.DataManagerImpl;
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
 
 /**
@@ -67,6 +66,11 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
 
     }
 
+    /**
+     * Rate the Gif item passed in as argument.
+     * @param adapterGifItem Gif to be rated.
+     * @param rating Rating submitted by user.
+     */
     @Override
     public void rateGif(AdapterGifItem adapterGifItem, int rating) {
         // Check if rating is greater than 0, else show an invalid rating error toast.
@@ -115,9 +119,9 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
      */
     @Override
     public void onResumeCalled() {
-        // If gif title is not available, set App name as Activity title, otherwise use Gif title.
+        // If gif title is not available, set default Activity title, otherwise use Gif title.
         if (TextUtils.isEmpty(gif.getTitle())) {
-            view.setActivityTitle(Constants.ACTIVITY_TITLE_APP_NAME);
+            view.setDefaultActivityTitle();
         } else {
             view.setActivityTitle(gif.getTitle());
         }

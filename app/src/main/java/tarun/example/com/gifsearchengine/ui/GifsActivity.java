@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import tarun.example.com.gifsearchengine.R;
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsFragment;
 import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 

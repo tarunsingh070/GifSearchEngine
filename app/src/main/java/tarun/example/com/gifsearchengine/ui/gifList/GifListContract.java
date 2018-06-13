@@ -1,10 +1,11 @@
 package tarun.example.com.gifsearchengine.ui.gifList;
 
-import android.support.v4.app.FragmentActivity;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.paging.PagedList;
 
-import java.util.List;
-
-import tarun.example.com.gifsearchengine.data.model.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.remote.giphy.GifsDataSource;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.ui.BasePresenter;
 
 /**
@@ -15,17 +16,21 @@ public interface GifListContract {
 
     interface View {
 
-        FragmentActivity getFragmentActivity();
-
         boolean isViewVisible();
 
-        void updateGifsListAdapterData(List<AdapterGifItem> gifs);
+        void bindGifsListAdapterData(LiveData<PagedList<AdapterGifItem>> pagedList);
 
         void setSortingDropDownVisibility(boolean visibility);
 
-        void setActivityTitle(String title);
+        void registerDataSourceFactoryUpdate(MutableLiveData<GifsDataSource> gifsDataSourceMutableLiveData);
 
-        void showErrorMessage(Exception exception);
+        boolean isNetworkConnectivityAvailable();
+
+        void showNetworkConnectivityError();
+
+        void showOrHideRetryButton(boolean shouldShow);
+
+        void showErrorMessage(String message);
 
     }
 
@@ -34,6 +39,8 @@ public interface GifListContract {
         void searchQueryChanged(String query);
 
         void sortByOptionUpdated(int position);
+
+        void retryButtonClicked();
 
     }
 

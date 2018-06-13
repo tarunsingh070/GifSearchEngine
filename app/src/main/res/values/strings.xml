@@ -7,7 +7,11 @@
     <string name="invalid_rating_error_message">Rating cannot be less than 1</string>
     <string name="hint_search">Search Gifs</string>
     <string name="formatted_size_with_unit_kb">%s kb</string>
-    <string name="formatted_dimension_with_unit_px">%s px</string>
+    <string name="formatted_dimensions">%s x %s</string>
     <string name="desired_import_date_format">MMM dd, yyyy</string>
     <string name="received_import_date_format">yyyy-mm-dd HH:mm:ss</string>
+    <string name="title_trending">Trending</string>
+    <string name="loading">Loading</string>
+    <string name="retry">Retry</string>
+    <string name="no_connection_message">Internet connection Unavailable.</string>
 </resources>
