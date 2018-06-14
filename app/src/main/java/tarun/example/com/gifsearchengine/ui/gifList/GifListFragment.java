@@ -31,8 +31,8 @@ import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.data.model.NetworkState;
 import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsFragment;
 import tarun.example.com.gifsearchengine.util.HttpUtil;
-import tarun.example.com.gifsearchengine.util.KeyboardUtils;
-import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
+import tarun.example.com.gifsearchengine.util.KeyboardUtil;
+import tarun.example.com.gifsearchengine.util.ProgressBarUtil;
 
 /**
  * This fragment defines the UI to show the Gifs in a grid view format.
@@ -149,7 +149,7 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         return new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                KeyboardUtils.hideKeyboard(getContext(), getActivity());
+                KeyboardUtil.hideKeyboard(getContext(), getActivity());
                 return false;
             }
             @Override
@@ -188,9 +188,9 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
                 if (networkState == NetworkState.LOADING) {
-                    ProgressBarUtils.showProgressBarCenter(getActivity());
+                    ProgressBarUtil.showProgressBarCenter(getActivity());
                 } else {
-                    ProgressBarUtils.hideProgressBarCenter(getActivity());
+                    ProgressBarUtil.hideProgressBarCenter(getActivity());
                 }
             }
         });
@@ -200,9 +200,9 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
             public void onChanged(@Nullable NetworkState networkState) {
                 // FixMe: Find a way to show this loader only after initial loading.
                 if (networkState == NetworkState.LOADING && gifsDataSourceListAdapter.getItemCount() > Constants.LOADING_PAGE_SIZE) {
-                    ProgressBarUtils.showProgressBarBottom(getActivity());
+                    ProgressBarUtil.showProgressBarBottom(getActivity());
                 } else {
-                    ProgressBarUtils.hideProgressBarBottom(getActivity());
+                    ProgressBarUtil.hideProgressBarBottom(getActivity());
                 }
             }
         });

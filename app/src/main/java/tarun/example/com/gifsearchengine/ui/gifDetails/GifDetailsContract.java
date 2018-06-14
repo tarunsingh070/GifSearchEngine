@@ -1,5 +1,7 @@
 package tarun.example.com.gifsearchengine.ui.gifDetails;
 
+import android.content.Context;
+
 import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.ui.BasePresenter;
 
@@ -13,7 +15,7 @@ public class GifDetailsContract {
 
         void loadGif(String url);
 
-        void populateGifDetails(String averageRating);
+        void populateGifDetails();
 
         void showInvalidRatingErrorMessage();
 
@@ -21,9 +23,17 @@ public class GifDetailsContract {
 
         void setActivityTitle(String title);
 
+        Context getApplicationContext();
+
+        void showRatingDialog();
+
+        void showRatingDialog(int existingRating);
+
     }
 
     interface Presenter extends BasePresenter<View> {
+
+        void ratingButtonClicked();
 
         void rateGif(AdapterGifItem gif, int rating);
 

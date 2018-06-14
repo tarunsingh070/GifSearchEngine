@@ -2,42 +2,46 @@ package tarun.example.com.gifsearchengine.ui.gifDetails;
 
 import android.text.TextUtils;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-
 import tarun.example.com.gifsearchengine.data.DataManager;
 import tarun.example.com.gifsearchengine.data.DataManagerImpl;
-import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
 import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
+import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
+import tarun.example.com.gifsearchengine.data.model.room.UserRatedGif;
+import tarun.example.com.gifsearchengine.util.NumberUtil;
 
 /**
  * A presenter class which would fetch data from data sources through model classes and feed it to the
  * view ({@link GifDetailsFragment}) to be displayed.
  */
-public class GifDetailsPresenter implements GifDetailsContract.Presenter {
+public class GifDetailsPresenter implements GifDetailsContract.Presenter, DataManagerImpl.GetRatedGifByIdResponseListener {
 
     private GifDetailsContract.View view;
     private DataManager dataManager;
     private AdapterGifItem gif;
-
-    public GifDetailsPresenter() {
-        dataManager = new DataManagerImpl();
-    }
+    private UserRatedGif existingUserRatedGif;
 
     public GifDetailsPresenter(AdapterGifItem gif) {
-        this();
         this.gif = gif;
     }
 
     @Override
     public void takeView(GifDetailsContract.View view) {
         this.view = view;
+        dataManager = new DataManagerImpl(view.getApplicationContext(), this);
+        loadUsersPreviouslyRatedGifData();
         loadData();
     }
 
     @Override
     public void dropView() {
         view = null;
+    }
+
+    /**
+     * Load the previously rated gif data from the local db for the currently loaded gif.
+     */
+    private void loadUsersPreviouslyRatedGifData() {
+        dataManager.fetchRatedGifById(gif.getId());
     }
 
     /**
@@ -57,13 +61,16 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
             gif.setUserName("Unknown");
         }
 
-        // Send rating as "Not Rated" if current rating is 0 for this gif, otherwise send the current average rating.
-        if (gif.getAverageRating() > 0) {
-            view.populateGifDetails(String.valueOf(gif.getAverageRating()));
-        } else {
-            view.populateGifDetails("Not Rated");
-        }
+        view.populateGifDetails();
+    }
 
+    @Override
+    public void ratingButtonClicked() {
+        if (existingUserRatedGif != null) {
+            view.showRatingDialog(existingUserRatedGif.getRatingGiven());
+        } else {
+            view.showRatingDialog();
+        }
     }
 
     /**
@@ -75,43 +82,89 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
     public void rateGif(AdapterGifItem adapterGifItem, int rating) {
         // Check if rating is greater than 0, else show an invalid rating error toast.
         if (rating > 0) {
-            // Increment the rating count by 1, find the new average rating and then write the updated object to Firebase DB.
-            int newRatingCount = adapterGifItem.getRatingCount() + 1;
-            float newAverageRating = ((adapterGifItem.getAverageRating() * adapterGifItem.getRatingCount()) + rating)/newRatingCount;
-            newAverageRating = getRoundedRating(newAverageRating);
 
-            // Update the gif item.
-            gif.setAverageRating(newAverageRating);
-            gif.setRatingCount(newRatingCount);
+            // Condition to check if this gif has been rated by the current user sometime before as well.
+            boolean isExistingUserRatedGif = existingUserRatedGif != null && existingUserRatedGif.getRatingGiven() > 0;
 
-            dataManager.addOrUpdateGif(new FirebaseGif(adapterGifItem.getId(), newAverageRating, newRatingCount, adapterGifItem.getPreviewUrl()));
+            updateFirebaseDatabase(isExistingUserRatedGif, adapterGifItem, rating);
 
-            // Reload gif rating.
-            refreshRatingInUI();
+            updateLocalDatabase(isExistingUserRatedGif, adapterGifItem, rating);
+
         } else {
             view.showInvalidRatingErrorMessage();
         }
     }
 
     /**
-     * Round the rating to one decimal place.
+     * This method updates the data related to the currently rated gif in firebase db.
+     * @param isExistingUserRatedGif Condition to check if this gif has been rated by the current user sometime before as well.
+     * @param adapterGifItem The gif item containing info to be stored in firebase db.
+     * @param rating Rating submitted by user.
      */
-    private float getRoundedRating(float averageRating) {
-        DecimalFormat df = new DecimalFormat("#.#");
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Float.valueOf(df.format(averageRating));
+    private void updateFirebaseDatabase(boolean isExistingUserRatedGif, AdapterGifItem adapterGifItem, int rating) {
+        int newRatingCount = adapterGifItem.getRatingCount();
+        float totalRatingStarsTillNow = adapterGifItem.getAverageRating() * adapterGifItem.getRatingCount();
+
+        if (isExistingUserRatedGif) {
+            int oldRating = existingUserRatedGif.getRatingGiven();
+            int newRating = rating;
+            // If the old rating given by the user and the new one are the same, then no need to
+            // update anything and simply return.
+            if (oldRating == newRating) {
+                return;
+            }
+
+            // Since this gif has previously been rated too and now user is trying to update the rating given before,
+            // so decrement the previously given rating from the total and add the new rating given to the total.
+            totalRatingStarsTillNow = totalRatingStarsTillNow - oldRating + newRating;
+        } else {
+            // Since this gif hasn't been rated before, so add the rating given by user to the existing total star counts.
+            totalRatingStarsTillNow += rating;
+            // Increment the total ratings count by 1, else only average rating needs to be calculated
+            // and updated in firebase while the number of total ratings remain the same.
+            newRatingCount++;
+        }
+
+        // Find the new average rating and then write the updated object to Firebase DB.
+        float newAverageRating = totalRatingStarsTillNow/newRatingCount;
+        newAverageRating = NumberUtil.getRoundedToOneDecimalPlace(newAverageRating);
+
+        // Update the gif item.
+        gif.setAverageRating(newAverageRating);
+        gif.setRatingCount(newRatingCount);
+
+        dataManager.addOrUpdateGif(new FirebaseGif(adapterGifItem.getId(), newAverageRating, newRatingCount, adapterGifItem.getPreviewUrl()));
+
+        // Reload gif rating.
+        refreshRatingInUI();
+    }
+
+    /**
+     * This method updates the data related to the currently rated gif in local db (Room).
+     * @param isExistingUserRatedGif Condition to check if this gif has been rated by the current user sometime before as well.
+     * @param adapterGifItem The gif item containing info to be stored in firebase db.
+     * @param rating Rating submitted by user.
+     */
+    private void updateLocalDatabase(boolean isExistingUserRatedGif, AdapterGifItem adapterGifItem, int rating) {
+        // Add rated gif in local database.
+        UserRatedGif userRatedGif = new UserRatedGif(adapterGifItem.getId(), rating);
+
+        // If the gif being rated has previously been rated as well, then update it in db, else add a new entry.
+        if (isExistingUserRatedGif) {
+            dataManager.updateRatedGif(userRatedGif);
+            // Update the existing local gif item for further use
+            existingUserRatedGif.setRatingGiven(rating);
+        } else {
+            dataManager.insertRatedGif(userRatedGif);
+            existingUserRatedGif = userRatedGif;
+        }
     }
 
     /**
      * Refresh rating data in UI.
      */
     private void refreshRatingInUI() {
-        // Send rating as "Not Rated" if current rating is 0 for this gif, otherwise send the current average rating.
-        if (gif.getAverageRating() > 0) {
-            view.populateGifDetails(String.valueOf(gif.getAverageRating()));
-        } else {
-            view.populateGifDetails("Not Rated");
-        }
+        view.populateGifDetails();
     }
 
     /**
@@ -125,5 +178,10 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter {
         } else {
             view.setActivityTitle(gif.getTitle());
         }
+    }
+
+    @Override
+    public void responseReceived(UserRatedGif userRatedGif) {
+        existingUserRatedGif = userRatedGif;
     }
 }

@@ -5,6 +5,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import okhttp3.Callback;
 import tarun.example.com.gifsearchengine.data.model.firebase.FirebaseGif;
+import tarun.example.com.gifsearchengine.data.model.room.UserRatedGif;
 
 /**
  * An interface which would act as the one and only interface for managing all sorts of data calls (local as well as remote)
@@ -25,5 +26,11 @@ public interface DataManager {
     void getRankedGifsFromFirebase(ValueEventListener listener);
 
     void getRankedGifsFromFirebase(ChildEventListener listener);
+
+    void fetchRatedGifById(String id);
+
+    void insertRatedGif(UserRatedGif ratedGif);
+
+    void updateRatedGif(UserRatedGif ratedGif);
 
 }

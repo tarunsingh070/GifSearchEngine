@@ -12,7 +12,7 @@ import tarun.example.com.gifsearchengine.R;
 /**
  * A utility class for all progress bar related utility methods.
  */
-public class ProgressBarUtils {
+public class ProgressBarUtil {
 
     /**
      * A utility method that returns a white circular placeholder progress bar.

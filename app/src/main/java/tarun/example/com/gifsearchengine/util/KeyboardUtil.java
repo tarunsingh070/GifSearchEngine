@@ -8,7 +8,7 @@ import android.view.inputmethod.InputMethodManager;
 /**
  * A utility class for all keyboard related utility methods.
  */
-public class KeyboardUtils {
+public class KeyboardUtil {
 
     /**
      * Utility method to explicitly hide soft keyboard.

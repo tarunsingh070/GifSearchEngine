@@ -1,6 +1,7 @@
 package tarun.example.com.gifsearchengine.ui.gifDetails;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +28,7 @@ import java.util.Date;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
-import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
+import tarun.example.com.gifsearchengine.util.ProgressBarUtil;
 import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 
 /**
@@ -42,8 +43,9 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     private AdapterGifItem gif;
 
     private ImageView ivGif;
+    private RatingBar averageRatingBar;
+    private TextView tvRatingCount;
     private TextView tvTitle;
-    private TextView tvRating;
     private TextView tvUploader;
     private TextView tvUploadDate;
     private TextView tvDimension;
@@ -102,9 +104,10 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_gif_details, container, false);
         ivGif = rootView.findViewById(R.id.iv_gif);
+        averageRatingBar = rootView.findViewById(R.id.average_rating_bar);
+        tvRatingCount = rootView.findViewById(R.id.tv_rating_count);
         tvUploader = rootView.findViewById(R.id.tv_uploader);
         tvTitle = rootView.findViewById(R.id.tv_title);
-        tvRating = rootView.findViewById(R.id.tv_rating);
         tvUploadDate = rootView.findViewById(R.id.tv_upload_date);
         tvDimension = rootView.findViewById(R.id.tv_dimension);
         tvSize = rootView.findViewById(R.id.tv_size);
@@ -112,7 +115,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         fabRateMeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showRatingDialog();
+                presenter.ratingButtonClicked();
             }
         });
         return rootView;
@@ -127,7 +130,16 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     /**
      * Create a custom rating dialog to allow user to rate the Gif.
      */
-    private void showRatingDialog() {
+    @Override
+    public void showRatingDialog() {
+        showRatingDialog(0);
+    }
+
+    /**
+     * Create a custom rating dialog to allow user to rate the Gif and pre-set the rating bar as per existing rating..
+     */
+    @Override
+    public void showRatingDialog(int existingRating) {
         // Inflate view for Ratings Dialog.
         LayoutInflater li = LayoutInflater.from(getContext());
         View rateMeDialogView = li.inflate(R.layout.dialog_rate_me, null);
@@ -145,6 +157,11 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         final RatingBar ratingBar = rateMeDialogView.findViewById(R.id.rating_bar);
         Button okButton = rateMeDialogView.findViewById(R.id.button_submit);
         Button cancelButton = rateMeDialogView.findViewById(R.id.button_cancel);
+
+        // Pre-set rating in rating bar.
+        if (existingRating > 0) {
+            ratingBar.setRating(existingRating);
+        }
 
         // Bind views.
         okButton.setOnClickListener(new View.OnClickListener() {
@@ -181,7 +198,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
      */
     @Override
     public void loadGif(String url) {
-        CircularProgressDrawable progressPlaceHolder = ProgressBarUtils.getCircularProgressPlaceholder(getContext());
+        CircularProgressDrawable progressPlaceHolder = ProgressBarUtil.getCircularProgressPlaceholder(getContext());
         if (!TextUtils.isEmpty(url)) {
             Glide.with(getContext())
                     .asGif()
@@ -196,9 +213,10 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
      * Populate all views with the details of the Gif opened.
      */
     @Override
-    public void populateGifDetails(String averageRating) {
+    public void populateGifDetails() {
+        averageRatingBar.setRating(gif.getAverageRating());
+        tvRatingCount.setText(String.valueOf(gif.getRatingCount()));
         tvTitle.setText(gif.getTitle());
-        tvRating.setText(averageRating);
         tvUploader.setText(gif.getUserName());
         tvUploadDate.setText(getFormattedDate(gif.getImportDate()));
         tvDimension.setText(getString(R.string.formatted_dimensions, gif.getFullGif().getHeight()
@@ -230,4 +248,8 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         Toast.makeText(getContext(), R.string.invalid_rating_error_message, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public Context getApplicationContext() {
+        return getContext().getApplicationContext();
+    }
 }

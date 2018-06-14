@@ -23,16 +23,6 @@ allprojects {
     }
 }
 
-ext {
-    // Add dependencies
-    okhttpVersion = '3.10.0'
-    gsonVersion = '2.8.4'
-    glideVersion = '4.7.1'
-    firebaseDatabaseVersion = '11.8.0'
-    pagingVersion = "1.0.0"
-    junitVersion = '4.12'
-}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

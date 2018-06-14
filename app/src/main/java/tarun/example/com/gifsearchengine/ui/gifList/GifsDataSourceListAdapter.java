@@ -14,7 +14,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
-import tarun.example.com.gifsearchengine.util.ProgressBarUtils;
+import tarun.example.com.gifsearchengine.util.ProgressBarUtil;
 
 /**
  * The Adapter class of type {@link PagedListAdapter} which provides pagination support while loading
@@ -69,7 +69,7 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
          */
         void loadGif(String url) {
             if (!TextUtils.isEmpty(url)) {
-                CircularProgressDrawable progressPlaceHolder = ProgressBarUtils.getCircularProgressPlaceholder(ivGif.getContext());
+                CircularProgressDrawable progressPlaceHolder = ProgressBarUtil.getCircularProgressPlaceholder(ivGif.getContext());
                 Glide.with(ivGif.getContext())
                         .asGif()
                         .load(url)
