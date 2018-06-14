@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.paging.PagedList;
 import android.content.Context;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +13,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.transition.Explode;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -282,8 +286,34 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     }
 
     @Override
-    public void onItemClick(AdapterGifItem gif) {
+    public void onItemClick(AdapterGifItem gif, View view) {
+        animateExit(view);
         mListener.onGifClicked(gif);
+    }
+
+    /**
+     * Clear the screen with an exploding animation with the clickedView as epicenter of explosion
+     * @param clickedView Epicenter of explosion.
+     */
+    private void animateExit(View clickedView) {
+        // save rect of clicked view in screen coordinates.
+        final Rect viewRect = new Rect();
+        clickedView.getGlobalVisibleRect(viewRect);
+
+        // create Explode transition with the clicked view as epicenter.
+        Transition explode = new Explode();
+        explode.setEpicenterCallback(new Transition.EpicenterCallback() {
+                    @Override
+                    public Rect onGetEpicenter(Transition transition) {
+                        return viewRect;
+                    }
+                });
+
+        explode.setDuration(1000);
+        TransitionManager.beginDelayedTransition(gifsRecyclerView, explode);
+
+        // remove all views from Recycler View
+        gifsRecyclerView.setAdapter(null);
     }
 
     /**

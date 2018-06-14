@@ -14,4 +14,5 @@
     <string name="loading">Loading</string>
     <string name="retry">Retry</string>
     <string name="no_connection_message">Internet connection Unavailable.</string>
+    <string name="gif_zoom_in_message">Tap on gif to zoom in and zoom out.</string>
 </resources>

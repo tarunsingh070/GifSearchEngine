@@ -82,7 +82,7 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
         @Override
         public void onClick(View view) {
             if (itemClickListener != null) {
-                itemClickListener.onItemClick(getItem(getAdapterPosition()));
+                itemClickListener.onItemClick(getItem(getAdapterPosition()), view);
             }
         }
     }
@@ -91,6 +91,6 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
      * {@link GifListFragment} will implement this interface in order to communicate when a gif item is clicked.
      */
     public interface ItemClickListener {
-        void onItemClick(AdapterGifItem gif);
+        void onItemClick(AdapterGifItem gif, View clickedView);
     }
 }
