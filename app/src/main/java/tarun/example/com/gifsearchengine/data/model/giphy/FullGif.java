@@ -13,6 +13,16 @@ public class FullGif implements Parcelable {
     private String height;
     private String size;
 
+    public FullGif() {
+    }
+
+    public FullGif(String url, String width, String height, String size) {
+        this.url = url;
+        this.width = width;
+        this.height = height;
+        this.size = size;
+    }
+
     protected FullGif(Parcel in) {
         url = in.readString();
         width = in.readString();

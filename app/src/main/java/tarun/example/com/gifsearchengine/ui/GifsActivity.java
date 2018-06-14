@@ -28,7 +28,7 @@ public class GifsActivity extends AppCompatActivity implements GifListFragment.O
 
         manager = getSupportFragmentManager();
 
-        // Create and instance of GifListFragment and add it as soon as Home Activity is launched.
+        // Create an instance of GifListFragment and add it as soon as Home Activity is launched.
         Fragment gifListFragment = manager.findFragmentById(R.id.fragment_container);
 
         if (gifListFragment == null) {

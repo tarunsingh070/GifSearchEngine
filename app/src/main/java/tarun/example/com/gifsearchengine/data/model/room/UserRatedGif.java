@@ -5,6 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import java.util.Objects;
+
 import tarun.example.com.gifsearchengine.data.Constants;
 
 /**
@@ -41,5 +43,19 @@ public class UserRatedGif {
 
     public void setRatingGiven(int ratingGiven) {
         this.ratingGiven = ratingGiven;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gifId, ratingGiven);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof UserRatedGif) {
+            UserRatedGif gif = (UserRatedGif) obj;
+            return Objects.equals(gifId, gif.gifId) && Objects.equals(ratingGiven, gif.ratingGiven);
+        }
+        return false;
     }
 }

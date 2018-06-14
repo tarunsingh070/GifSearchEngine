@@ -46,7 +46,7 @@ public class GifListPresenter implements GifListContract.Presenter {
 
     private String searchQuery;
 
-    GifListPresenter() {
+    public GifListPresenter() {
         dataManager = new DataManagerImpl();
         rankedGifItems = new ArrayList<>();
     }
