@@ -18,10 +18,6 @@ A simple Gif search engine to search various gifs based on the keywords you type
 * The ranking persists globally as the information about ranked gifs is stored in a Firebase database.
 * Click on any gif to see the details of the gif such as Title, uploader, upload date, size, average rating etc.
 
-## Currently unavailable stuff.
-
-* Unit tests for views.
-
 ### Architecture
 
 This Project follows the Model-View-Presenter architecture.
