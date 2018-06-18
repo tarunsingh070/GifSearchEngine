@@ -28,7 +28,7 @@ public class AdapterGifItem implements Parcelable, Comparable<AdapterGifItem> {
 
     private int ratingCount;
 
-    public static DiffUtil.ItemCallback<AdapterGifItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<AdapterGifItem>() {
+    public static final DiffUtil.ItemCallback<AdapterGifItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<AdapterGifItem>() {
         @Override
         public boolean areItemsTheSame(@NonNull AdapterGifItem oldItem, @NonNull AdapterGifItem newItem) {
             return oldItem.id.equals(newItem.id);

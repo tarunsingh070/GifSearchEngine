@@ -20,8 +20,8 @@ import tarun.example.com.gifsearchengine.data.remote.firebase.FirebaseDbHelperIm
  */
 public class DataManagerImpl implements DataManager, GifsRoomDbHelperImpl.getRatedGifByIdAsyncTask.GetRatedGifAsyncResponseListener {
 
-    private GiphyRestClient restClient;
-    private FirebaseDbHelper firebaseDbHelper;
+    private final GiphyRestClient restClient;
+    private final FirebaseDbHelper firebaseDbHelper;
     private GifsRoomDbHelper gifsRoomDbHelper;
     private GetRatedGifByIdResponseListener responseCallback;
 

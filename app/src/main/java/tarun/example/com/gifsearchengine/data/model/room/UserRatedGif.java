@@ -29,11 +29,12 @@ public class UserRatedGif {
         this.ratingGiven = ratingGiven;
     }
 
+    @NonNull
     public String getGifId() {
         return gifId;
     }
 
-    public void setGifId(String gifId) {
+    public void setGifId(@NonNull String gifId) {
         this.gifId = gifId;
     }
 

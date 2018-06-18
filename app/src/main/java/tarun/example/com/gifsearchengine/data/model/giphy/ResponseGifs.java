@@ -10,9 +10,7 @@ import java.util.List;
 public class ResponseGifs {
 
     @SerializedName("data")
-    List<Gif> gifs;
-
-    Pagination pagination;
+    private List<Gif> gifs;
 
     public List<Gif> getGifs() {
         return gifs;
@@ -20,13 +18,5 @@ public class ResponseGifs {
 
     public void setGifs(List<Gif> gifs) {
         this.gifs = gifs;
-    }
-
-    public Pagination getPagination() {
-        return pagination;
-    }
-
-    public void setPagination(Pagination pagination) {
-        this.pagination = pagination;
     }
 }

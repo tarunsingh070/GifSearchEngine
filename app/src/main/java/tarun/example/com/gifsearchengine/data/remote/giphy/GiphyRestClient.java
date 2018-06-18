@@ -19,7 +19,7 @@ public class GiphyRestClient {
     private static final String URL_SEARCH_GIFS = "v1/gifs/search";
     private static final String GIPHY_API_KEY = "tKSHo2xJBooBR7H2o7AYdl4hu6YRF7Wf";
 
-    private OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient();
 
     /**
      * Factory method to return an instance of Giphy Rest Client.

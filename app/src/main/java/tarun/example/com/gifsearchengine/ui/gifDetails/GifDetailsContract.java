@@ -9,7 +9,7 @@ import tarun.example.com.gifsearchengine.ui.BasePresenter;
  * A contract interface that defines what methods the {@link GifDetailsFragment} and the {@link GifDetailsPresenter}
  * must implement in order to communicate with each other.
  */
-public class GifDetailsContract {
+class GifDetailsContract {
 
     interface View {
 
@@ -25,6 +25,10 @@ public class GifDetailsContract {
 
         Context getApplicationContext();
 
+        boolean isNetworkConnectivityAvailable();
+
+        void showNetworkConnectivityError();
+
         void showRatingDialog();
 
         void showRatingDialog(int existingRating);
@@ -38,6 +42,8 @@ public class GifDetailsContract {
         void rateGif(AdapterGifItem gif, int rating);
 
         void onResumeCalled();
+
+        void retryRatingSubmission(AdapterGifItem adapterGifItem, int rating);
 
     }
 

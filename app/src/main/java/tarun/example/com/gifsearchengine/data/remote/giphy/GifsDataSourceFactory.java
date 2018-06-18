@@ -13,10 +13,10 @@ import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
  */
 public class GifsDataSourceFactory extends DataSource.Factory<Integer, AdapterGifItem> {
 
-    private MutableLiveData<GifsDataSource> gifsDataSourceMutableLiveData = new MutableLiveData<>();
-    private String searchTerm;
-    private List<AdapterGifItem> rankedGifItems;
-    private int sortBySelectedOptionPosition;
+    private final MutableLiveData<GifsDataSource> gifsDataSourceMutableLiveData = new MutableLiveData<>();
+    private final String searchTerm;
+    private final List<AdapterGifItem> rankedGifItems;
+    private final int sortBySelectedOptionPosition;
 
     public GifsDataSourceFactory(String searchTerm, List<AdapterGifItem> rankedGifItems, int sortBySelectedOptionPosition) {
         this.searchTerm = searchTerm;

@@ -15,9 +15,9 @@ import tarun.example.com.gifsearchengine.util.NumberUtil;
  */
 public class GifDetailsPresenter implements GifDetailsContract.Presenter, DataManagerImpl.GetRatedGifByIdResponseListener {
 
+    private final AdapterGifItem gif;
     private GifDetailsContract.View view;
     private DataManager dataManager;
-    private AdapterGifItem gif;
     private UserRatedGif existingUserRatedGif;
 
     public GifDetailsPresenter(AdapterGifItem gif) {
@@ -80,6 +80,15 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter, DataMa
      */
     @Override
     public void rateGif(AdapterGifItem adapterGifItem, int rating) {
+        // Check for network connectivity before proceeding. Although firebase supports auto retry on
+        // network calls when network connection is restored, in this case it could result in stale data
+        // being uploaded if data changes in firebase db after user submits rating here but before
+        // firebase actually writes the data in db once network connectivity is restored.
+        if (!view.isNetworkConnectivityAvailable()) {
+            view.showNetworkConnectivityError();
+            return;
+        }
+
         // Check if rating is greater than 0, else show an invalid rating error toast.
         if (rating > 0) {
 
@@ -177,6 +186,19 @@ public class GifDetailsPresenter implements GifDetailsContract.Presenter, DataMa
             view.setDefaultActivityTitle();
         } else {
             view.setActivityTitle(gif.getTitle());
+        }
+    }
+
+    /**
+     * When retry button is clicked, check for network connectivity and retry submission of rating,
+     * otherwise simply show no network error.
+     */
+    @Override
+    public void retryRatingSubmission(AdapterGifItem adapterGifItem, int rating) {
+        if (view.isNetworkConnectivityAvailable()) {
+            rateGif(adapterGifItem, rating);
+        } else {
+            view.showNetworkConnectivityError();
         }
     }
 

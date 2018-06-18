@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.CircularProgressDrawable;
@@ -25,6 +26,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ import java.util.Date;
 
 import tarun.example.com.gifsearchengine.R;
 import tarun.example.com.gifsearchengine.data.model.giphy.AdapterGifItem;
+import tarun.example.com.gifsearchengine.util.HttpUtil;
 import tarun.example.com.gifsearchengine.util.ProgressBarUtil;
 import tarun.example.com.gifsearchengine.ui.gifList.GifListFragment;
 
@@ -59,6 +62,9 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     private TextView tvUploadDate;
     private TextView tvDimension;
     private TextView tvSize;
+    private RelativeLayout layoutGif;
+    private FloatingActionButton fabZoom;
+    private RatingBar ratingBar;
 
     // Flag to keep track of wheather the gif is currently expanded or not.
     private boolean isGifExpanded;
@@ -111,16 +117,16 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_gif_details, container, false);
         final LinearLayout detailLayout = rootView.findViewById(R.id.detail_layout);
+        layoutGif = rootView.findViewById(R.id.layout_gif);
+        fabZoom = rootView.findViewById(R.id.fab_zoom);
         ivGif = rootView.findViewById(R.id.iv_gif);
-        final int originalGifViewerHeight = ivGif.getLayoutParams().height;
-        ivGif.setOnClickListener(getGifClickedAnimationListener(originalGifViewerHeight, detailLayout));
-        // Show an info toast to the user informing about the zoom in/zoom out feature.
-        Toast.makeText(getContext(), R.string.gif_zoom_in_message, Toast.LENGTH_LONG).show();
+        final int originalGifViewerHeight = layoutGif.getLayoutParams().height;
+        fabZoom.setOnClickListener(getGifClickedAnimationListener(originalGifViewerHeight, detailLayout));
 
         averageRatingBar = rootView.findViewById(R.id.average_rating_bar);
         tvRatingCount = rootView.findViewById(R.id.tv_rating_count);
@@ -129,8 +135,8 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         tvUploadDate = rootView.findViewById(R.id.tv_upload_date);
         tvDimension = rootView.findViewById(R.id.tv_dimension);
         tvSize = rootView.findViewById(R.id.tv_size);
-        final FloatingActionButton fabRateMeButton = rootView.findViewById(R.id.fab_rate);
-        fabRateMeButton.setOnClickListener(getRateButtonClickedListener());
+        final FloatingActionButton fabRateMe = rootView.findViewById(R.id.fab_rate);
+        fabRateMe.setOnClickListener(getRateButtonClickedListener());
         return rootView;
     }
 
@@ -143,7 +149,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     /**
      * Returns a click listener for zoom in and zoom out animations on gif being loaded.
      */
-    private View.OnClickListener getGifClickedAnimationListener(final int originalGifViewerHeight, final ViewGroup layout) {
+    private View.OnClickListener getGifClickedAnimationListener(final int originalGifLayoutHeight, final ViewGroup layout) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,14 +158,22 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
                         .addTransition(new ChangeBounds())
                         .addTransition(new ChangeImageTransform()));
 
-                ViewGroup.LayoutParams params = ivGif.getLayoutParams();
-                params.height = isGifExpanded ? originalGifViewerHeight :
-                        ViewGroup.LayoutParams.MATCH_PARENT;
-                ivGif.setLayoutParams(params);
-
-                ivGif.setScaleType(isGifExpanded ? ImageView.ScaleType.FIT_XY :
-                        ImageView.ScaleType.CENTER_CROP);
+                // Toggle gif expansion state
                 isGifExpanded = !isGifExpanded;
+
+                // Change zoom button icon based on current zoom state.
+                int zoomIconRes = isGifExpanded ? R.drawable.ic_zoom_out : R.drawable.ic_zoom_in;
+                fabZoom.setImageResource(zoomIconRes);
+
+                // Change height of the layout showing gif to cover the whole screen height.
+                ViewGroup.LayoutParams params = layoutGif.getLayoutParams();
+                params.height = isGifExpanded ? ViewGroup.LayoutParams.MATCH_PARENT :
+                        originalGifLayoutHeight;
+                layoutGif.setLayoutParams(params);
+
+                // Change scale type of gif image view as per expansion state.
+                ivGif.setScaleType(isGifExpanded ? ImageView.ScaleType.CENTER_CROP :
+                        ImageView.ScaleType.FIT_XY);
             }
         };
     }
@@ -169,12 +183,15 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
      */
     private View.OnClickListener getRateButtonClickedListener() {
         return new View.OnClickListener() {
+            float rotationAngle;
             @Override
             public void onClick(View v) {
+                // Increment the angle each time so that the star can rotate further on each click.
+                rotationAngle += 216f;
                 // Perform rotating animation when clicked.
                 final Interpolator interpolator = new DecelerateInterpolator();
                 ViewCompat.animate(v).
-                        rotation(180f).
+                        rotation(rotationAngle).
                         withLayer().
                         setDuration(1000).
                         setInterpolator(interpolator).
@@ -212,7 +229,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
         final AlertDialog alertDialog = alertDialogBuilder.create();
 
         // Initialize views.
-        final RatingBar ratingBar = rateMeDialogView.findViewById(R.id.rating_bar);
+        ratingBar = rateMeDialogView.findViewById(R.id.rating_bar);
         Button okButton = rateMeDialogView.findViewById(R.id.button_submit);
         Button cancelButton = rateMeDialogView.findViewById(R.id.button_cancel);
 
@@ -302,6 +319,26 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
             // Return an empty string in case of issues parsing the date string received.
             e.printStackTrace();
             return "";
+        }
+    }
+
+    @Override
+    public boolean isNetworkConnectivityAvailable() {
+        return HttpUtil.isNetworkAvailable(getContext());
+    }
+
+    @Override
+    public void showNetworkConnectivityError() {
+        if (getView() != null) {
+            Snackbar networkIssueSnackBar = Snackbar.make(getView(), R.string.no_connection_message, Snackbar.LENGTH_INDEFINITE);
+            networkIssueSnackBar.setAction(R.string.retry, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Retry rating submission.
+                    presenter.retryRatingSubmission(gif, (int)ratingBar.getRating());
+                }
+            });
+            networkIssueSnackBar.show();
         }
     }
 

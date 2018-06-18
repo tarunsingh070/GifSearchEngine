@@ -28,13 +28,13 @@ public class GifsActivity extends AppCompatActivity implements GifListFragment.O
 
         manager = getSupportFragmentManager();
 
-        // Create an instance of GifListFragment and add it as soon as Home Activity is launched.
-        Fragment gifListFragment = manager.findFragmentById(R.id.fragment_container);
+        Fragment fragment = manager.findFragmentById(R.id.fragment_container);
 
-        if (gifListFragment == null) {
-            gifListFragment = GifListFragment.newInstance();
+        if (fragment == null) {
+            // If no fragment was found, create an instance of GifListFragment and add it as soon as Home Activity is created.
+            fragment = GifListFragment.newInstance();
             manager.beginTransaction()
-                    .add(R.id.fragment_container, gifListFragment, GifListFragment.TAG)
+                    .add(R.id.fragment_container, fragment, GifListFragment.TAG)
                     .commit();
         }
     }

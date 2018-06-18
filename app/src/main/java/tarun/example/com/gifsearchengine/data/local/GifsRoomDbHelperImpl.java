@@ -11,7 +11,7 @@ import tarun.example.com.gifsearchengine.data.model.room.UserRatedGif;
  */
 public class GifsRoomDbHelperImpl implements GifsRoomDbHelper {
 
-    private GifDao gifDao;
+    private final GifDao gifDao;
 
     public GifsRoomDbHelperImpl(Context appContext) {
         RatedGifsDatabase ratedGifsDatabase = RatedGifsDatabase.getDatabase(appContext);
@@ -38,8 +38,8 @@ public class GifsRoomDbHelperImpl implements GifsRoomDbHelper {
      */
     public static class getRatedGifByIdAsyncTask extends AsyncTask<String, Void, UserRatedGif> {
 
-        private GifDao dao;
-        private GetRatedGifAsyncResponseListener responseCallback;
+        private final GifDao dao;
+        private final GetRatedGifAsyncResponseListener responseCallback;
 
         getRatedGifByIdAsyncTask(GifDao dao, GetRatedGifAsyncResponseListener responseCallback) {
             this.dao = dao;
@@ -68,7 +68,7 @@ public class GifsRoomDbHelperImpl implements GifsRoomDbHelper {
      */
     private static class insertGifAsyncTask extends AsyncTask<UserRatedGif, Void, Void> {
 
-        private GifDao mAsyncTaskDao;
+        private final GifDao mAsyncTaskDao;
 
         insertGifAsyncTask(GifDao dao) {
             mAsyncTaskDao = dao;
@@ -86,7 +86,7 @@ public class GifsRoomDbHelperImpl implements GifsRoomDbHelper {
      */
     private static class updateGifAsyncTask extends AsyncTask<UserRatedGif, Void, Void> {
 
-        private GifDao mAsyncTaskDao;
+        private final GifDao mAsyncTaskDao;
 
         updateGifAsyncTask(GifDao dao) {
             mAsyncTaskDao = dao;

@@ -37,18 +37,19 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
 
     private final MutableLiveData<NetworkState> networkState = new MutableLiveData<>();
     private final MutableLiveData<NetworkState> initialLoading = new MutableLiveData<>();
+    private final MutableLiveData<Exception> errorDetails = new MutableLiveData<>();
     private final DataManager dataManager;
     private String searchTerm;
     private int sortBySelectedOptionPosition;
 
     // List of the most recent gif items fetched from Giphy Api.
-    private List<AdapterGifItem> newUnrankedGifItems;
+    private final List<AdapterGifItem> newUnrankedGifItems;
 
     // List of adapter gif items created from gif items received from FirebaseDatabase.
     private List<AdapterGifItem> rankedGifItems;
 
     // Final list of adapter gif items that will be displayed through the adapter.
-    private List<AdapterGifItem> finalizedGifItems;
+    private final List<AdapterGifItem> finalizedGifItems;
 
     public MutableLiveData<NetworkState> getNetworkState() {
         return networkState;
@@ -56,6 +57,10 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
 
     public MutableLiveData<NetworkState> getInitialLoading() {
         return initialLoading;
+    }
+
+    public MutableLiveData<Exception> getErrorDetails() {
+        return errorDetails;
     }
 
     private GifsDataSource() {
@@ -102,6 +107,7 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "Api call to retrieve Initial set of gifs failed.", e);
                 setLoadingStates(true, NetworkState.FAILED);
+                setErrorState(e);
             }
 
             @Override
@@ -116,6 +122,7 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
                 } else {
                     Log.e(TAG, "Api call to retrieve Initial set of gifs completed unsuccessfully due to : " + response.message());
                     setLoadingStates(true, NetworkState.FAILED);
+                    setErrorState(new UnsuccessfulItemsLoadingException(response.message()));
                 }
             }
         };
@@ -153,6 +160,7 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "Api call to retrieve paginated gifs failed.", e);
                 setLoadingStates(false, NetworkState.FAILED);
+                setErrorState(e);
             }
 
             @Override
@@ -165,6 +173,7 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
                 } else {
                     Log.e(TAG, "Api call to retrieve paginated gifs completed unsuccessfully due to : " + response.message());
                     setLoadingStates(false, NetworkState.FAILED);
+                    setErrorState(new UnsuccessfulItemsLoadingException(response.message()));
                 }
             }
         };
@@ -263,12 +272,29 @@ public class GifsDataSource extends PositionalDataSource<AdapterGifItem> {
     }
 
     /**
+     * Set the error details in case network call fails due to some reason.
+     * @param e Exception occurred.
+     */
+    private void setErrorState(Exception e) {
+        errorDetails.postValue(e);
+    }
+
+    /**
      * Order the gif items based on the sorting option selected before being displayed to the user.
      */
     private void setGifItemsOrdering() {
         // If the currently selected sort option is by Ranking, then sort the list as per each Gif's rating.
         if (sortBySelectedOptionPosition == GifListFragment.SPINNER_OPTION_RANKING_POSITION) {
             Collections.sort(finalizedGifItems);
+        }
+    }
+
+    /**
+     * A custom exception class to throw a custom exception when api calls to giphy return unsuccessful response.
+     */
+    class UnsuccessfulItemsLoadingException extends Exception {
+        UnsuccessfulItemsLoadingException(String message) {
+            super(message);
         }
     }
 }

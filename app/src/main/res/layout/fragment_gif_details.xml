@@ -8,20 +8,39 @@
     android:orientation="vertical"
     tools:context=".ui.gifDetails.GifDetailsFragment">
 
-    <ImageView
-        android:id="@+id/iv_gif"
+    <RelativeLayout
+        android:id="@+id/layout_gif"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:scaleType="fitXY" />
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/iv_gif"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:scaleType="fitXY" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_zoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_zoom_in"
+            app:backgroundTint="#80000000"
+            app:fabSize="mini" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginEnd="10dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:paddingTop="10dp"
         android:layout_weight="1">
 
         <RelativeLayout

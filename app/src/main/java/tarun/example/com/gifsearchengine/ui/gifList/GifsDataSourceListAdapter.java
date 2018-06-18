@@ -1,6 +1,7 @@
 package tarun.example.com.gifsearchengine.ui.gifList;
 
 import android.arch.paging.PagedListAdapter;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -24,7 +25,7 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
 
     private static final String TAG = GifsDataSourceListAdapter.class.getSimpleName();
 
-    private ItemClickListener itemClickListener;
+    private final ItemClickListener itemClickListener;
 
     GifsDataSourceListAdapter(ItemClickListener itemClickListener) {
         super(AdapterGifItem.DIFF_CALLBACK);
@@ -32,15 +33,16 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
     }
 
     // inflates the cell layout from xml when needed
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_gif, parent, false);
         return new ViewHolder(view);
     }
 
     // Calls the bind method of viewholder to bind the data to various views in each cell.
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(getItem(position));
     }
 
@@ -48,7 +50,7 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
      * Viewholder class for RecyclerView.
      */
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView ivGif;
+        final ImageView ivGif;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -58,7 +60,7 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
         /**
          * Bind the data from the gif object received into views.
          */
-        void bind(AdapterGifItem gif) {
+        void bind(@NonNull AdapterGifItem gif) {
             loadGif(gif.getPreviewUrl());
             itemView.setOnClickListener(this);
         }
@@ -82,7 +84,7 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
         @Override
         public void onClick(View view) {
             if (itemClickListener != null) {
-                itemClickListener.onItemClick(getItem(getAdapterPosition()), view);
+                itemClickListener.onItemClick(getItem(getAdapterPosition()));
             }
         }
     }
@@ -91,6 +93,6 @@ public class GifsDataSourceListAdapter extends PagedListAdapter<AdapterGifItem, 
      * {@link GifListFragment} will implement this interface in order to communicate when a gif item is clicked.
      */
     public interface ItemClickListener {
-        void onItemClick(AdapterGifItem gif, View clickedView);
+        void onItemClick(AdapterGifItem gif);
     }
 }

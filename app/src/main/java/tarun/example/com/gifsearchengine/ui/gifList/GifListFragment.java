@@ -5,17 +5,14 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.paging.PagedList;
 import android.content.Context;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.transition.Explode;
-import android.transition.Transition;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -54,8 +50,7 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     private MenuItem sortMenuItem;
     private GifsDataSourceListAdapter gifsDataSourceListAdapter;
 
-    SearchView searchView;
-    Button retryButton;
+    private View emptyView;
 
     public GifListFragment() {
         // Required empty public constructor
@@ -75,28 +70,18 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        presenter = new GifListPresenter();
+
+        // If fragment is being re-created and has a saved state available, then pass it to the presenter for restoration.
+        presenter = new GifListPresenter(savedInstanceState);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().setTitle(R.string.title_trending);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_gif_list, container, false);
         gifsRecyclerView = rootView.findViewById(R.id.rv_gifs);
-        retryButton = rootView.findViewById(R.id.button_retry);
-        retryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.retryButtonClicked();
-            }
-        });
+        emptyView = rootView.findViewById(R.id.layout_empty);
         return rootView;
     }
 
@@ -104,7 +89,12 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupGifsRecyclerView();
-        presenter.takeView(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        presenter.saveState(outState);
     }
 
     @Override
@@ -115,11 +105,13 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
 
         // Get searchView and add a text listener on it to perform search.
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) searchMenuItem.getActionView();
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
         searchView.setOnQueryTextListener(getSearchTextListener());
 
         sortMenuItem = menu.findItem(R.id.spinner_sort);
         setupSortingSpinner();
+
+        presenter.takeView(this);
     }
 
     /**
@@ -164,9 +156,18 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         };
     }
 
+    /**
+     * Clears the adapter data.
+     */
     @Override
-    public void setSortingDropDownVisibility(boolean visibility) {
+    public void clearAdapterData() {
+        gifsDataSourceListAdapter.submitList(null);
+    }
+
+    @Override
+    public void setSortingDropDownVisibility(boolean visibility, int selectedPosition) {
         sortMenuItem.setVisible(visibility);
+        ((Spinner) sortMenuItem.getActionView()).setSelection(selectedPosition);
     }
 
     /**
@@ -192,9 +193,10 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
                 if (networkState == NetworkState.LOADING) {
-                    ProgressBarUtil.showProgressBarCenter(getActivity());
+                    showProgressBar();
                 } else {
-                    ProgressBarUtil.hideProgressBarCenter(getActivity());
+                    hideProgressBar();
+                    showEmptyPlaceholder(gifsDataSourceListAdapter.getItemCount() == 0);
                 }
             }
         });
@@ -202,7 +204,6 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
         gifsDataSource.getNetworkState().observe(this, new Observer<NetworkState>() {
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
-                // FixMe: Find a way to show this loader only after initial loading.
                 if (networkState == NetworkState.LOADING && gifsDataSourceListAdapter.getItemCount() > Constants.LOADING_PAGE_SIZE) {
                     ProgressBarUtil.showProgressBarBottom(getActivity());
                 } else {
@@ -210,6 +211,27 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
                 }
             }
         });
+
+        gifsDataSource.getErrorDetails().observe(this, new Observer<Exception>() {
+            @Override
+            public void onChanged(@Nullable Exception exception) {
+                presenter.onErrorOccurred(exception);
+            }
+        });
+    }
+
+    private void showEmptyPlaceholder(boolean shouldShow) {
+        emptyView.setVisibility(shouldShow ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    @Override
+    public void showProgressBar() {
+        ProgressBarUtil.showProgressBarCenter(getActivity());
+    }
+
+    @Override
+    public void hideProgressBar() {
+        ProgressBarUtil.hideProgressBarCenter(getActivity());
     }
 
     @Override
@@ -253,7 +275,11 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
      */
     private void setupGifsRecyclerView() {
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), NO_OF_COLUMNS);
-        gifsDataSourceListAdapter = new GifsDataSourceListAdapter(this);
+        // If coming back from details fragment, show the gifs list in the same state as it was in
+        // when user left the list screen.
+        if (gifsDataSourceListAdapter == null) {
+            gifsDataSourceListAdapter = new GifsDataSourceListAdapter(this);
+        }
         gifsRecyclerView.setLayoutManager(gridLayoutManager);
         gifsRecyclerView.setAdapter(gifsDataSourceListAdapter);
     }
@@ -262,12 +288,6 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
     public void onDestroyView() {
         super.onDestroyView();
         presenter.dropView();
-    }
-
-    @Override
-    public void showOrHideRetryButton(boolean shouldShow) {
-        int visibility = shouldShow ? View.VISIBLE : View.GONE;
-        retryButton.setVisibility(visibility);
     }
 
     @Override
@@ -282,38 +302,31 @@ public class GifListFragment extends Fragment implements GifListContract.View, G
 
     @Override
     public void showNetworkConnectivityError() {
-        showErrorMessage(getString(R.string.no_connection_message));
+        if (getView() != null) {
+            Snackbar networkIssueSnackBar = Snackbar.make(getView(), R.string.no_connection_message, Snackbar.LENGTH_INDEFINITE);
+            networkIssueSnackBar.setAction(R.string.retry, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.retryButtonClicked();
+                }
+            });
+            networkIssueSnackBar.show();
+        }
     }
 
     @Override
-    public void onItemClick(AdapterGifItem gif, View view) {
-        animateExit(view);
-        mListener.onGifClicked(gif);
+    public void setDefaultActivityTitle() {
+        getActivity().setTitle(R.string.title_trending);
     }
 
-    /**
-     * Clear the screen with an exploding animation with the clickedView as epicenter of explosion
-     * @param clickedView Epicenter of explosion.
-     */
-    private void animateExit(View clickedView) {
-        // save rect of clicked view in screen coordinates.
-        final Rect viewRect = new Rect();
-        clickedView.getGlobalVisibleRect(viewRect);
+    @Override
+    public void setActivityTitle(String title) {
+        getActivity().setTitle(title);
+    }
 
-        // create Explode transition with the clicked view as epicenter.
-        Transition explode = new Explode();
-        explode.setEpicenterCallback(new Transition.EpicenterCallback() {
-                    @Override
-                    public Rect onGetEpicenter(Transition transition) {
-                        return viewRect;
-                    }
-                });
-
-        explode.setDuration(1000);
-        TransitionManager.beginDelayedTransition(gifsRecyclerView, explode);
-
-        // remove all views from Recycler View
-        gifsRecyclerView.setAdapter(null);
+    @Override
+    public void onItemClick(AdapterGifItem gif) {
+        mListener.onGifClicked(gif);
     }
 
     /**
