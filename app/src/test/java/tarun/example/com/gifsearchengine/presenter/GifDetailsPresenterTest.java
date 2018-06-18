@@ -19,6 +19,7 @@ import tarun.example.com.gifsearchengine.ui.gifDetails.GifDetailsPresenter;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Using only JUnit and Mockito frameworks here to create unit tests to test {@link GifDetailsPresenter} class.
@@ -38,6 +39,16 @@ public class GifDetailsPresenterTest {
         MockitoAnnotations.initMocks(this);
         gif = GifTestUtil.getTestAdapterGifItem();
         presenter = new GifDetailsPresenter(gif);
+    }
+
+    private void mockNetworkNotAvailable() {
+        when(view.isNetworkConnectivityAvailable())
+                .thenReturn(false);
+    }
+
+    private void mockNetworkAvailable() {
+        when(view.isNetworkConnectivityAvailable())
+                .thenReturn(true);
     }
 
     private void presenterTakeView() {
@@ -106,7 +117,19 @@ public class GifDetailsPresenterTest {
     }
 
     @Test
+    public void ratingSubmissionWhenNetworkUnavailableTest() {
+        mockNetworkNotAvailable();
+        presenterTakeView();
+
+        // Call rate gif method when user sets rating to 0 in rating bar and tries to submit it.
+        presenter.rateGif(gif, 1);
+
+        verify(view).showNetworkConnectivityError();
+    }
+
+    @Test
     public void invalidRatingMessageDisplayTest() {
+        mockNetworkAvailable();
         presenterTakeView();
 
         // Call rate gif method when user sets rating to 0 in rating bar and tries to submit it.

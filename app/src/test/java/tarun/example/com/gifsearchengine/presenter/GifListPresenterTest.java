@@ -36,7 +36,7 @@ public class GifListPresenterTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        presenter = new GifListPresenter();
+        presenter = new GifListPresenter(null);
     }
 
     private void mockNetworkNotAvailable() {
@@ -68,8 +68,7 @@ public class GifListPresenterTest {
         presenterTakeView();
 
         // Since firebase classes cannot be mocked, we can check if an attempt to fetch firebase items must have
-        // been made by verifying that the methods to show retry button and connectivity error were not called.
-        verify(view, times(0)).showOrHideRetryButton(true);
+        // been made by verifying that the method to show network connectivity error was not called.
         verify(view, times(0)).showNetworkConnectivityError();
     }
 
@@ -78,10 +77,9 @@ public class GifListPresenterTest {
         mockNetworkNotAvailable();
         presenterTakeView();
 
-        // Verify that the methods to show retry button and connectivity error were called since
+        // Verify that the methods to show network connectivity error was called since
         // network connectivity is unavailable.
-        verify(view).showOrHideRetryButton(true);
-        verify(view).showNetworkConnectivityError();
+        verify(view, times(2)).showNetworkConnectivityError();
     }
 
     @Test
@@ -90,10 +88,9 @@ public class GifListPresenterTest {
         presenterTakeView();
         presenter.searchQueryChanged("test");
 
-        // Verify that the methods to show retry button and connectivity error were called when user
-        // changed the saerch query since network connectivity is unavailable.
-        verify(view).showOrHideRetryButton(true);
-        verify(view).showNetworkConnectivityError();
+        // Verify that the methods to show network connectivity error was called when user
+        // changed the search query since network connectivity is unavailable.
+        verify(view, times(2)).showNetworkConnectivityError();
     }
 
     @Test
@@ -106,7 +103,7 @@ public class GifListPresenterTest {
         presenter.searchQueryChanged("test");
         verify(view).registerDataSourceFactoryUpdate(any(MutableLiveData.class));
         verify(view).bindGifsListAdapterData(any(LiveData.class));
-        verify(view).setSortingDropDownVisibility(true);
+        verify(view).setSortingDropDownVisibility(true, 0);
     }
 
     @Test
@@ -116,10 +113,11 @@ public class GifListPresenterTest {
         mockIsViewVisibleTrue();
 
         // Verify that the appropriate methods are called when search query is empty and network is available.
+        presenter.searchQueryChanged("t");
         presenter.searchQueryChanged("");
-        verify(view).registerDataSourceFactoryUpdate(any(MutableLiveData.class));
-        verify(view).bindGifsListAdapterData(any(LiveData.class));
-        verify(view).setSortingDropDownVisibility(false);
+        verify(view, times(2)).registerDataSourceFactoryUpdate(any(MutableLiveData.class));
+        verify(view, times(2)).bindGifsListAdapterData(any(LiveData.class));
+        verify(view).setSortingDropDownVisibility(false, 0);
     }
 
     @Test
@@ -128,7 +126,7 @@ public class GifListPresenterTest {
         presenterTakeView();
 
         presenter.retryButtonClicked();
-        verify(view, times(2)).showNetworkConnectivityError();
+        verify(view, times(3)).showNetworkConnectivityError();
     }
 
     @Test
@@ -141,7 +139,7 @@ public class GifListPresenterTest {
         } catch (Error e) {
             // Do nothing as we're catching the exception occurring due to inability to mock Firebase classes.
         }
-        verify(view).showOrHideRetryButton(false);
+        verify(view).showProgressBar();
     }
 
     @Test
@@ -152,7 +150,7 @@ public class GifListPresenterTest {
         // different sort by option selected, so loading of results should be triggered and method to
         // show retry button should be triggered because of no network connectivity.
         presenter.sortByOptionUpdated(0);
-        verify(view).showOrHideRetryButton(true);
+        verify(view, times(2)).showNetworkConnectivityError();
     }
 
 }
