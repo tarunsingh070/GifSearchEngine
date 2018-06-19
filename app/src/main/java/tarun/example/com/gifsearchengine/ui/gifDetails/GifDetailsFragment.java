@@ -3,6 +3,7 @@ package tarun.example.com.gifsearchengine.ui.gifDetails;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,9 @@ import android.transition.ChangeImageTransform;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -92,6 +96,7 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             gif = getArguments().getParcelable(ARG_GIF);
         }
@@ -103,6 +108,34 @@ public class GifDetailsFragment extends Fragment implements GifDetailsContract.V
     public void onResume() {
         super.onResume();
         presenter.onResumeCalled();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_gif_detail, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_share:
+                launchShareIntent();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Launch the share dialog displaying all sharing options to the user.
+     */
+    private void launchShareIntent() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, gif.getFullGif().getUrl());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.share_dialog_title)));
     }
 
     @Override
